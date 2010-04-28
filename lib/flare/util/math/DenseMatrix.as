@@ -27,7 +27,7 @@ package flare.util.math
 		public function get sum():Number {
 			var sum:Number = 0;
 			for (var i:uint=0; i<_v.length; ++i)
-				sum += _v[i];
+				sum += Number(_v[i]);
 			return sum;
 		}
 		/** @inheritDoc */

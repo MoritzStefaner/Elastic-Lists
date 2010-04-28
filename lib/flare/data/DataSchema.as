@@ -12,7 +12,7 @@ package flare.data {
 		public var dataRoot:String = null;
 		public var hasHeader:Boolean = false;
 		
-		private var _fields:Vector.</*DataField*/Object> = new Vector.<Object>();
+		private var _fields:Vector.<Object> = new Vector.<Object>();
 		private var _nameLookup:/*String->DataField*/Object = {};
 		private var _idLookup:/*String->DataField*/Object = {};
 		

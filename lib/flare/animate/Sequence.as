@@ -15,9 +15,9 @@ package flare.animate {
 		// -- Properties ------------------------------------------------------
 		
 		/** Array of sequential transitions */
-		protected var _trans:Vector.</*Transition*/Object> = new Vector.<Object>();
+		protected var _trans:Vector.<Object> = new Vector.<Object>();
 		/** @private */
-		protected var _fracs:Vector.</*Number*/Object> = new Vector.<Object>();
+		protected var _fracs:Vector.<Object> = new Vector.<Object>();
 		/** @private */
 		protected var _autodur:Boolean = true;
 		/** @private */

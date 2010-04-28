@@ -30,8 +30,8 @@ package flare.vis.controls {
 		
 		private var _add0:DisplayObject = null;
 		private var _rem0:DisplayObject = null;
-		private var _add:Vector.</*DisplayObject*/Object> = null;
-		private var _rem:Vector.</*DisplayObject*/Object> = null;
+		private var _add:Vector.<Object> = null;
+		private var _rem:Vector.<Object> = null;
 		
 		/** The active hit area over which selection
 		 *  interactions can be performed. */
