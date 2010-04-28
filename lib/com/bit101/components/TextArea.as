@@ -86,6 +86,7 @@ package com.bit101.components
 			_tf.width = _width - _scrollbar.width - 4;
 			_scrollbar.x = _width - _scrollbar.width;
 			_scrollbar.height = _height;
+			_scrollbar.draw();
 			addEventListener(Event.ENTER_FRAME, onTextScrollDelay);
 		}
 		

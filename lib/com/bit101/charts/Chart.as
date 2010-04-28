@@ -138,6 +138,7 @@ package com.bit101.charts
 		{
 			super.draw();
 			_panel.setSize(width, height);
+			_panel.draw();
 			_chartHolder.graphics.clear();
 			if(_data != null)
 			{

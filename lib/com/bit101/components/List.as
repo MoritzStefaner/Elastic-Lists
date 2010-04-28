@@ -39,6 +39,7 @@ package com.bit101.components
 		protected var _itemHolder:Sprite;
 		protected var _panel:Panel;
 		protected var _listItemHeight:Number = 20;
+		protected var _listItemClass:Class =ListItem;
 		protected var _scrollbar:VScrollBar;
 		protected var _selectedIndex:int = -1;
 		protected var _defaultColor:uint = 0xffffff;
@@ -54,7 +55,7 @@ package com.bit101.components
 		 */
 		public function List(parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, items:Array=null)
 		{
-			if(_items != null)
+			if(items != null)
 			{
 				_items = items;
 			}
@@ -96,16 +97,16 @@ package com.bit101.components
 
 			for(var i:int = 0; i < _items.length; i++)
 			{
-				var label:String = "";
-				if(_items[i] is String)
-				{
-					label = _items[i];
-				}
-				else if(_items[i].label is String)
-				{
-					label = _items[i].label;
-				}
-				var item:ListItem = new ListItem(_itemHolder, 0, i * _listItemHeight, label);
+//				var label:String = "";
+//				if(_items[i] is String)
+//				{
+//					label = _items[i];
+//				}
+//				else if(_items[i].label is String)
+//				{
+//					label = _items[i].label;
+//				}
+				var item:ListItem = new _listItemClass(_itemHolder, 0, i * _listItemHeight, _items[i]);
 				item.setSize(width, _listItemHeight);
 				item.defaultColor = _defaultColor;
 				item.selectedColor = _selectedColor;
@@ -242,6 +243,8 @@ package com.bit101.components
 		 */
 		protected function onSelect(event:Event):void
 		{
+			if(! (event.target is ListItem)) return;
+			
 			for(var i:int = 0; i < _itemHolder.numChildren; i++)
 			{
 				if(_itemHolder.getChildAt(i) == event.target) _selectedIndex = i;
@@ -290,6 +293,7 @@ package com.bit101.components
 			{
 				_selectedIndex = index;
 				invalidate();
+				dispatchEvent(new Event(Event.SELECT));
 			}
 		}
 		public function get selectedItem():Object
@@ -365,6 +369,20 @@ package com.bit101.components
 		{
 			return _items;
 		}
+
+		/**
+		 * Sets / gets the class used to render list items. Must extend ListItem.
+		 */
+		public function set listItemClass(value:Class):void
+		{
+			_listItemClass = value;
+			invalidate();
+		}
+		public function get listItemClass():Class
+		{
+			return _listItemClass;
+		}
+
 		
 	}
 }

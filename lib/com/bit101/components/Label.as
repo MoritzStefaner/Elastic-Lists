@@ -29,6 +29,7 @@
 package com.bit101.components
 {
 	import flash.display.DisplayObjectContainer;
+	import flash.events.Event;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
@@ -48,7 +49,7 @@ package com.bit101.components
 		 */
 		public function Label(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number =  0, text:String = "")
 		{
-			_text = text;
+			this.text = text;
 			super(parent, xpos, ypos);
 		}
 		
@@ -97,6 +98,7 @@ package com.bit101.components
 			{
 				_tf.autoSize = TextFieldAutoSize.LEFT;
 				_width = _tf.width;
+				dispatchEvent(new Event(Event.RESIZE));
 			}
 			else
 			{
@@ -120,6 +122,7 @@ package com.bit101.components
 		public function set text(t:String):void
 		{
 			_text = t;
+			if(_text == null) _text = "";
 			invalidate();
 		}
 		public function get text():String
@@ -137,6 +140,14 @@ package com.bit101.components
 		public function get autoSize():Boolean
 		{
 			return _autoSize;
+		}
+		
+		/**
+		 * Gets the internal TextField of the label if you need to do further customization of it.
+		 */
+		public function get textField():TextField
+		{
+			return _tf;
 		}
 	}
 }

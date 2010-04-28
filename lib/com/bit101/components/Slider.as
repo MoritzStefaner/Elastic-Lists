@@ -50,6 +50,7 @@ package com.bit101.components
 		
 		/**
 		 * Constructor
+		 * @param orientation Whether the slider will be horizontal or vertical.
 		 * @param parent The parent DisplayObjectContainer on which to add this Slider.
 		 * @param xpos The x position to place this component.
 		 * @param ypos The y position to place this component.
@@ -164,12 +165,12 @@ package com.bit101.components
 			var range:Number;
 			if(_orientation == HORIZONTAL)
 			{
-				range = width - height;
+				range = _width - _height;
 				_handle.x = (_value - _min) / (_max - _min) * range;
 			}
 			else
 			{
-				range = height - width;
+				range = _height - _width;
 				_handle.y = _height - _width - (_value - _min) / (_max - _min) * range;
 			}
 		}
@@ -219,17 +220,17 @@ package com.bit101.components
 		{
 			if(_orientation == HORIZONTAL)
 			{
-				_handle.x = mouseX - height / 2;
+				_handle.x = mouseX - _height / 2;
 				_handle.x = Math.max(_handle.x, 0);
-				_handle.x = Math.min(_handle.x, width - height);
-				_value = _handle.x / (width - height) * (_max - _min) + _min;
+				_handle.x = Math.min(_handle.x, _width - _height);
+				_value = _handle.x / (width - _height) * (_max - _min) + _min;
 			}
 			else
 			{
-				_handle.y = mouseY - width / 2;
+				_handle.y = mouseY - _width / 2;
 				_handle.y = Math.max(_handle.y, 0);
-				_handle.y = Math.min(_handle.y, height - width);
-				_value = (_height - _width - _handle.y) / (height - width) * (_max - _min) + _min;
+				_handle.y = Math.min(_handle.y, _height - _width);
+				_value = (_height - _width - _handle.y) / (height - _width) * (_max - _min) + _min;
 			}
 			dispatchEvent(new Event(Event.CHANGE));
 			
@@ -245,11 +246,11 @@ package com.bit101.components
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onSlide);
 			if(_orientation == HORIZONTAL)
 			{
-				_handle.startDrag(false, new Rectangle(0, 0, width - height, 0));
+				_handle.startDrag(false, new Rectangle(0, 0, _width - _height, 0));
 			}
 			else
 			{
-				_handle.startDrag(false, new Rectangle(0, 0, 0, height - width));
+				_handle.startDrag(false, new Rectangle(0, 0, 0, _height - _width));
 			}
 		}
 		
@@ -273,11 +274,11 @@ package com.bit101.components
 			var oldValue:Number = _value;
 			if(_orientation == HORIZONTAL)
 			{
-				_value = _handle.x / (width - height) * (_max - _min) + _min;
+				_value = _handle.x / (width - _height) * (_max - _min) + _min;
 			}
 			else
 			{
-				_value = (_height - _width - _handle.y) / (height - width) * (_max - _min) + _min;
+				_value = (_height - _width - _handle.y) / (height - _width) * (_max - _min) + _min;
 			}
 			if(_value != oldValue)
 			{

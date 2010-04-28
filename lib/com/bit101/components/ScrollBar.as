@@ -29,16 +29,27 @@
 package com.bit101.components
 {
 	import flash.display.DisplayObjectContainer;
+	import flash.display.Shape;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.events.TimerEvent;
+	import flash.utils.Timer;
 
 	public class ScrollBar extends Component
 	{
+		protected const DELAY_TIME:int = 500;
+		protected const REPEAT_TIME:int = 100; 
+		protected const UP:String = "up";
+		protected const DOWN:String = "down";
+		
 		protected var _upButton:PushButton;
 		protected var _downButton:PushButton;
 		protected var _scrollSlider:ScrollSlider;
 		protected var _orientation:String;
 		protected var _lineSize:int = 1;
+		protected var _delayTimer:Timer;
+		protected var _repeatTimer:Timer;
+		protected var _direction:String;
 		
 		/**
 		 * Constructor
@@ -64,10 +75,28 @@ package com.bit101.components
 		override protected function addChildren():void
 		{
 			_scrollSlider = new ScrollSlider(_orientation, this, 0, 10, onChange);
-			_upButton = new PushButton(this, 0, 0, "", onUpClick);
+			_upButton = new PushButton(this, 0, 0, "");
+			_upButton.addEventListener(MouseEvent.MOUSE_DOWN, onUpClick);
 			_upButton.setSize(10, 10);
-			_downButton = new PushButton(this, 0, 0, "", onDownClick);
+			var upArrow:Shape = new Shape();
+			upArrow.graphics.beginFill(Style.DROPSHADOW, 0.5);
+			upArrow.graphics.moveTo(5, 3);
+			upArrow.graphics.lineTo(7, 6);
+			upArrow.graphics.lineTo(3, 6);
+			upArrow.graphics.endFill();
+			_upButton.addChild(upArrow);
+			
+			_downButton = new PushButton(this, 0, 0, "");
+			_downButton.addEventListener(MouseEvent.MOUSE_DOWN, onDownClick);
 			_downButton.setSize(10, 10);
+			var downArrow:Shape = new Shape();
+			downArrow.graphics.beginFill(Style.DROPSHADOW, 0.5);
+			downArrow.graphics.moveTo(5, 7);
+			downArrow.graphics.lineTo(7, 4);
+			downArrow.graphics.lineTo(3, 4);
+			downArrow.graphics.endFill();
+			_downButton.addChild(downArrow);
+			
 		}
 		
 		/**
@@ -84,6 +113,10 @@ package com.bit101.components
 			{
 				setSize(10, 100);
 			}
+			_delayTimer = new Timer(DELAY_TIME, 1);
+			_delayTimer.addEventListener(TimerEvent.TIMER_COMPLETE, onDelayComplete);
+			_repeatTimer = new Timer(REPEAT_TIME);
+			_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
 		}
 		
 		
@@ -194,20 +227,59 @@ package com.bit101.components
 		
 		protected function onUpClick(event:MouseEvent):void
 		{
+			goUp();
+			_direction = UP;
+			_delayTimer.start();
+			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+		}
+				
+		protected function goUp():void
+		{
 			_scrollSlider.value -= _lineSize;
 			dispatchEvent(new Event(Event.CHANGE));
 		}
 		
 		protected function onDownClick(event:MouseEvent):void
 		{
+			goDown();
+			_direction = DOWN;
+			_delayTimer.start();
+		}
+		
+		protected function goDown():void
+		{
 			_scrollSlider.value += _lineSize;
 			dispatchEvent(new Event(Event.CHANGE));
+		}
+		
+		protected function onMouseUp(event:MouseEvent):void
+		{
+			_delayTimer.stop();
+			_repeatTimer.stop();
 		}
 		
 		protected function onChange(event:Event):void
 		{
 			dispatchEvent(event);
 		}
+		
+		protected function onDelayComplete(event:TimerEvent):void
+		{
+			_repeatTimer.start();
+		}
+		
+		protected function onRepeat(event:TimerEvent):void
+		{
+			if(_direction == UP)
+			{
+				goUp();
+			}
+			else
+			{
+				goDown();
+			}
+		}
+		
 
 
 

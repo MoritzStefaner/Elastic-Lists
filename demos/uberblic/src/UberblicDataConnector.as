@@ -18,7 +18,7 @@ package {
 	 */
 	public class UberblicDataConnector extends DataConnector {
 
-		private var baseURL : String = "http://platform.uberblic.org/api/faceted_search?num_results=100&offset=0&facets=starring,director,producer,source&query=type:[uo:Film]";
+		public  var baseURL : String = "http://platform.uberblic.org/api/faceted_search?num_results=100&offset=0&facets=starring,director,producer,source&query=type:[uo:Film]";
 		public var numResults : Number;
 
 		public function UberblicDataConnector(m : Model) {
@@ -47,7 +47,6 @@ package {
 			
 			for (var facetName:String in response.facets) {
 				// get facet
-				if (facetName == "type") continue;
 				var f : Facet = model.getFacetByName(facetName);
 				
 				if(f == null) {

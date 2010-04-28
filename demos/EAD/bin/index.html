@@ -1,0 +1,64 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+	<title>ElasticLists-EAD</title>
+	
+	<script src="lib/swfobject.js" language="javascript"></script>
+	<script src="lib/swfaddress.js" language="javascript"></script>
+	<script src="lib/jquery-1.3.2.min.js" language="javascript"></script>
+	<script src="lib/tmpl.js" language="javascript"></script>
+	<link href="css/style.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+	
+		var flashvars = {
+		};
+		
+		var params = {
+		};
+		
+		var attributes = {
+			bgcolor: 			'#DDDDDD',
+		  	allowfullscreen:	"true",
+		  	allowscriptaccess:	"always"
+		};
+		
+		swfobject.embedSWF("ElasticLists-EAD.swf", "flash", "100%", "220", "9.0.0","lib/expressInstall.swf", flashvars, params, attributes);
+		
+		function onFilteredContentItemsChanged(contentItems){
+			// console.log("JS received contentItems", contentItems);
+			// display number of results
+			$("#numResults").html(contentItems.length);
+			// get result list jQuery object
+			var l=$("#resultList ol");
+	
+			// create contentItems
+			var maxItems=1050;
+			var listHTML="";
+			for(var i=0; i<maxItems && i<contentItems.length; i++){
+				listHTML += tmpl("resultListEntryTemplate", contentItems[i]);
+			}
+			l.empty().html(listHTML);
+		}
+
+	</script>
+
+	<!-- result list entry template -->
+	<script type="text/html" id="resultListEntryTemplate">
+		<li><a target='_blank' href='{%= url %}'>{%= title %}</a></li>
+	</script>
+	<!-- end result list entry template -->
+
+</head>
+
+<body>
+<h1>Elastic Lists: EAD demo</h1>
+
+<div id="flash">&bnsp;</div>
+<div id="resultList">
+	<h3><span id="numResults"></span> RESULTS</h3>
+	<ol class="clearfix">
+
+	</ol>
+</div>
+</body>
+</html>

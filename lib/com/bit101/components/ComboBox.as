@@ -398,6 +398,18 @@ package com.bit101.components
 			return _list.items;
 		}
 		
+		/**
+		 * Sets / gets the class used to render list items. Must extend ListItem.
+		 */
+		public function set listItemClass(value:Class):void
+		{
+			_list.listItemClass = value;
+		}
+		public function get listItemClass():Class
+		{
+			return _list.listItemClass;
+		}
+		
 		
 	}
 }

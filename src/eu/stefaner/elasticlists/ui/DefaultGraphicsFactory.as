@@ -1,8 +1,9 @@
 package eu.stefaner.elasticlists.ui {
-	import flash.text.TextFieldAutoSize;
+	import flash.text.AntiAliasType;
 	import flash.display.Sprite;
 	import flash.filters.DropShadowFilter;
 	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
 
 	/**
@@ -10,11 +11,21 @@ package eu.stefaner.elasticlists.ui {
 	 */
 	public class DefaultGraphicsFactory {
 
+		[Embed(source="/assets/PTS55F.ttf", fontName="regularFont", advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
+
+		private var regularFont : Class;
+		
+		[Embed(source="/assets/Aller_Bd.ttf", fontName="boldFont",  fontWeight='bold',  advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
+
+		private var boldFont : Class;
+
 		public static function getTextField() : TextField {
 			var t : TextField = new TextField();
 			t.autoSize = TextFieldAutoSize.LEFT;
 			t.multiline = false;
-			var tf : TextFormat = new TextFormat("PF Ronda Seven", 8, 0x333333);
+			t.embedFonts = true;
+			t.antiAliasType = AntiAliasType.ADVANCED;
+			var tf : TextFormat = new TextFormat("regularFont", 10, 0x333333);
 			t.defaultTextFormat = tf;
 		
 			return t;
@@ -33,8 +44,9 @@ package eu.stefaner.elasticlists.ui {
 		public static function getContentItemBackground() : Sprite {
 			var s : Sprite = new Sprite();
 			s.graphics.beginFill(0xFFFFFF);
+			s.graphics.lineStyle(0, 0xCCCCCC, 1);
 			s.graphics.drawRect(0, 0, 200, 100);
-			s.filters = [new DropShadowFilter(2, 45, 0, .2)];
+			//s.filters = [new DropShadowFilter(2, 45, 0, .2)];
 			return s;
 		}
 
@@ -49,15 +61,33 @@ package eu.stefaner.elasticlists.ui {
 			var t : TextField = new TextField();
 			t.autoSize = TextFieldAutoSize.LEFT;
 			t.multiline = false;
-			var tf : TextFormat = new TextFormat("Arial", 11, 0x444444, true);
+			t.embedFonts = true;
+			t.antiAliasType = AntiAliasType.ADVANCED;
+			var tf : TextFormat = new TextFormat("boldFont", 12, 0x333333, true);
 			t.defaultTextFormat = tf;
 			return t;
 		}
 
 		public static function getPanelBackground() : Sprite {
 			var s : Sprite = new Sprite();
-			s.graphics.beginFill(0xF0F0F0, 1);
+			s.graphics.beginFill(0xFFFFFF, 1);
 			s.graphics.drawRect(0, 0, 100, 100);
+			return s;
+		}
+
+		public static function getContentAreaBackground() : Sprite {
+			var s : Sprite = new Sprite();
+			s.graphics.beginFill(0xF0F0F0, 0);
+			s.graphics.drawRect(0, 0, 100, 100);
+			return s;
+		}
+
+		public static function getElasticListEntryBackground() : Sprite {
+			var s : Sprite = new Sprite();
+			s.graphics.beginFill(0xFFFFFF);
+			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
+			s.graphics.drawRect(0, 0, 200, 100);
+			s.filters = [new DropShadowFilter(2, 45, 0, .2)];
 			return s;
 		}
 	}

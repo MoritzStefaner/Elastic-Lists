@@ -120,7 +120,10 @@ package com.bit101.components
 		public function hide():void
 		{
 			visible = false;
-			stage.removeEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
+			if(stage != null)
+			{
+				stage.removeEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
+			}
 		}
 		
 		/**
@@ -145,7 +148,7 @@ package com.bit101.components
 			y = Math.round(parent.mouseY);
 			_selectedIndex = -1;
 			visible = true;
-			stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
+			stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp, true);
 		}
 		
 		///////////////////////////////////

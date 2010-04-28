@@ -50,7 +50,7 @@ package com.bit101.components
 		 */
 		public function InputText(parent:DisplayObjectContainer = null, xpos:Number = 0, ypos:Number =  0, text:String = "", defaultHandler:Function = null)
 		{
-			_text = text;
+			this.text = text;
 			super(parent, xpos, ypos);
 			if(defaultHandler != null)
 			{
@@ -106,7 +106,14 @@ package com.bit101.components
 			
 			_tf.displayAsPassword = _password;
 			
-			_tf.text = _text;
+			if(_text != null)
+			{
+				_tf.text = _text;
+			}
+			else 
+			{
+				_tf.text = "";
+			}
 			_tf.width = _width - 4;
 			if(_tf.text == "")
 			{
@@ -151,6 +158,7 @@ package com.bit101.components
 		public function set text(t:String):void
 		{
 			_text = t;
+			if(_text == null) _text = "";
 			invalidate();
 		}
 		public function get text():String

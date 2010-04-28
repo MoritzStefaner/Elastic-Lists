@@ -34,8 +34,8 @@ package com.bit101.components
 	
 	public class ListItem extends Component
 	{
+		protected var _data:Object;
 		protected var _label:Label;
-		protected var _labelText:String = "";
 		protected var _defaultColor:uint = 0xffffff;
 		protected var _selectedColor:uint = 0xdddddd;
 		protected var _rolloverColor:uint = 0xeeeeee;
@@ -49,9 +49,9 @@ package com.bit101.components
 		 * @param ypos The y position to place this component.
 		 * @param label The text to show in this item.
 		 */
-		public function ListItem(parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, label:String="")
+		public function ListItem(parent:DisplayObjectContainer=null, xpos:Number=0, ypos:Number=0, data:Object = null)
 		{
-			_labelText = label;
+			_data = data;
 			super(parent, xpos, ypos);
 		}
 		
@@ -71,8 +71,7 @@ package com.bit101.components
 		protected override function addChildren() : void
 		{
 			super.addChildren();
-			_label = new Label(this, 5, 0, _labelText);
-			_label.autoSize = false;
+			_label = new Label(this, 5, 0);
 		}
 		
 		///////////////////////////////////
@@ -100,7 +99,18 @@ package com.bit101.components
 			}
 			graphics.drawRect(0, 0, width, height);
 			graphics.endFill();
-			_label.text = _labelText;
+			if(_data is String)
+			{
+				_label.text = _data as String;
+			}
+			else if(_data.label is String)
+			{
+				_label.text = _data.label;
+			}
+			else
+			{
+				_label.text = _data.toString();
+			}
 		}
 		
 		
@@ -139,14 +149,14 @@ package com.bit101.components
 		/**
 		 * Sets/gets the string that appears in this item.
 		 */
-		public function set label(value:String):void
+		public function set data(value:Object):void
 		{
-			_labelText = value;
+			_data = value;
 			invalidate();
 		}
-		public function get label():String
+		public function get data():Object
 		{
-			return _labelText;
+			return _data;
 		}
 		
 		/**

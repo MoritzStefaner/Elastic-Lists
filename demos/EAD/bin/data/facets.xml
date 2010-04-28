@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<facets>
+	<!-- SUBJECT HEADINGS -->
+	<facet>
+		<type>nominal</type>
+		<label>Subjects</label>
+		<name>subject</name>
+	</facet>
+
+
+	<!-- FORMS OF MATERIAL -->
+	<facet>
+		<type>nominal</type>
+		<label>Type of material</label>
+		<name>genreform</name>
+	</facet>
+
+
+	<!-- PEOPLE -->
+	<facet>
+		<type>nominal</type>
+		<label>Personal names</label>
+		<name>persname</name>
+	</facet>
+
+
+	<!-- CORPORATE NAMES -->
+	<facet>
+		<type>nominal</type>
+		<label>Organizations</label>
+		<name>corpname</name>
+	</facet>
+
+
+	<!-- DATES -->
+	<facet>
+		<type>ordinal</type>
+		<label>Dates</label>
+		<name>unitdate</name>
+	</facet>
+
+	<!-- MEDIA TYPE -->
+
+	<facet>
+		<type>nominal</type>
+		<label>Media type</label>
+		<name>mediaType</name>
+		<facetValues>
+			<!-- 
+				You can specify facet values with their display labels here, 
+				but if label and ID are the same, you do not have to 
+				(they will be created automatically if they appear in contentItem facetValues)
+			-->
+			<facetValue>
+				<label>doc</label>
+				<name>doc</name>
+			</facetValue>
+			<facetValue>
+				<label>ppt</label>
+				<name>ppt</name>
+			</facetValue>
+			<facetValue>
+				<label>pdf</label>
+				<name>pdf</name>
+			</facetValue>
+			<facetValue>
+				<label>image</label>
+				<name>image</name>
+			</facetValue>
+			<facetValue>
+				<label>xls</label>
+				<name>xls</name>
+			</facetValue>
+			<facetValue>
+				<label>other</label>
+				<name>other</name>
+			</facetValue>
+			<facetValue>
+				<label>Finding aid</label>
+				<name>htm</name>
+			</facetValue>
+		</facetValues>
+	</facet>
+</facets>

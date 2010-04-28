@@ -40,7 +40,7 @@ package {
 			vBox.spacing = margin;
 			
 			var tf : TextField = DefaultGraphicsFactory.getTitleTextField();
-			tf.text = "Elastic Lists test application";
+			tf.text = loaderInfo.parameters.appTitle ? loaderInfo.parameters.appTitle : "Elastic Lists test application";
 			tf.scaleX = tf.scaleY = 2;
 			
 			vBox.addChild(tf);
@@ -55,7 +55,6 @@ package {
 				facetBox = new ElasticListBox();
 				
 				//facetBox.singleSelect = true;
-				
 				f.init(facet, facetBox);
 				hBox.addChild(f);
 				f.width = 180;
@@ -108,7 +107,10 @@ package {
 		}
 
 		override protected function createDataConnector() : DataConnector {
-			var d : DataConnector = new UberblicDataConnector(model);
+			var d : UberblicDataConnector = new UberblicDataConnector(model);
+			if(loaderInfo.parameters.queryURL) {
+				d.baseURL = loaderInfo.parameters.queryURL; 
+			}
 			d.addEventListener(DataConnector.DATA_LOADED, onDataLoaded);
 			return d;
 		}
