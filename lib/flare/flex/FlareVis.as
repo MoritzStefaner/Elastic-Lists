@@ -18,14 +18,14 @@ package flare.flex {
 		
 		/** The visualization operators used by this visualization. This
 		 *  should be an object vector of IOperator instances. */
-		public function set operators(a:Vector.</*IOperator*/Object>):void {
+		public function set operators(a:Vector.<Object>):void {
 			_vis.operators.list = a;
 			_vis.update();
 		}
 		
 		/** The interactive controls used by this visualization. This
 		 *  should be an object vector of IControl instances. */
-		public function set controls(a:Vector.</*IControl*/Object>):void {
+		public function set controls(a:Vector.<Object>):void {
 			_vis.controls.list = a;
 			_vis.update();
 		}

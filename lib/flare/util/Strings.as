@@ -309,7 +309,8 @@ package flare.util {
 				}
 				else if (c == _HR24) {
 					a = int(d.hours);
-					b.writeUTFBytes(n==2 ? pad(a,2) : String(a));
+					//b.writeUTFBytes(n==2 ? pad(a,2) : String(a));
+					b.writeUTFBytes( String(a));
 				}
 				else if (c == _MINS) {
 					a = int(d.minutes);

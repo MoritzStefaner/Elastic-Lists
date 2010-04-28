@@ -26,18 +26,13 @@
  * THE SOFTWARE.
  */
 
-package com.bit101.components
-{
-	
+package com.bit101.components {
 	import flash.display.DisplayObjectContainer;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
-	import flash.utils.setTimeout;
-	
-	import org.osmf.events.TimeEvent;
-	
+
 	public class NumericStepper extends Component
 	{
 		protected const DELAY_TIME:int = 500;
