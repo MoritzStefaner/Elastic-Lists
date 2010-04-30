@@ -108,5 +108,21 @@ package eu.stefaner.elasticlists.ui {
 			s.filters = [new DropShadowFilter(2, 45, 0, .2)];
 			return s;
 		}
+
+		public static function getMapMarkerBackground() : Sprite {
+			var s : Sprite = new Sprite();
+			s.graphics.beginFill(0x333333);
+			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
+			s.graphics.drawCircle(0, 0, 1);
+			return s;
+		}
+
+		public static function getMapMarkerSelectionMarker() : Sprite {
+			var s : Sprite = new Sprite();
+			s.graphics.beginFill(0xDDFF99);
+			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
+			s.graphics.drawCircle(0, 0, 1);
+			return s;
+		}
 	}
 }
