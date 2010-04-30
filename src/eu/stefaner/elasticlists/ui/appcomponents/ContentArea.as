@@ -1,3 +1,21 @@
+ /*
+   
+  Copyright 2010, Moritz Stefaner
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   
+*/
+
 package eu.stefaner.elasticlists.ui.appcomponents {	import eu.stefaner.elasticlists.App;	import eu.stefaner.elasticlists.data.ContentItem;	import eu.stefaner.elasticlists.data.DataItem;	import eu.stefaner.elasticlists.layout.TileLayout;	import eu.stefaner.elasticlists.ui.DefaultGraphicsFactory;	import eu.stefaner.elasticlists.ui.contentitem.ContentItemSprite;	import flare.animate.TransitionEvent;	import flare.animate.Transitioner;	import flare.util.Strings;	import flare.vis.Visualization;	import flare.vis.data.Data;	import org.osflash.thunderbolt.Logger;	import flash.display.Sprite;	import flash.events.Event;	import flash.text.TextField;	import flash.utils.Dictionary;	public class ContentArea extends Sprite {		public var  RESULTS_TEXT : String = "{0} resources found";
 		public var DELAY_PER_TILE : Number = 0;
 		public var app : App;		public var visualization : Visualization;		public var bg : Sprite;		public var title_tf : TextField;		public var selectedContentItem : ContentItem = null;		protected var transitioner : Transitioner;		protected var firstRun : Boolean = true;		public var maxItems : uint = 30;		public var TRANSITION_DURATION : Number = 1;		public var sortField : String;		protected var contentItemSpriteForContentItemID : Dictionary = new Dictionary();
