@@ -1,25 +1,28 @@
- /*
+/*
    
-  Copyright 2010, Moritz Stefaner
+Copyright 2010, Moritz Stefaner
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
    
-*/
+ */
 
 package eu.stefaner.elasticlists.ui {
-	import flash.text.AntiAliasType;
+	import com.bit101.components.PushButton;
+
+	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.filters.DropShadowFilter;
+	import flash.text.AntiAliasType;
 	import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
@@ -32,9 +35,8 @@ package eu.stefaner.elasticlists.ui {
 		[Embed(source="/assets/PTS55F.ttf", fontName="regularFont", advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
 
 		private var regularFont : Class;
-		
-		[Embed(source="/assets/Aller_Bd.ttf", fontName="boldFont",  fontWeight='bold',  advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
 
+		[Embed(source="/assets/Aller_Bd.ttf", fontName="boldFont",  fontWeight='bold',  advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
 		private var boldFont : Class;
 
 		public static function getTextField() : TextField {
@@ -107,6 +109,10 @@ package eu.stefaner.elasticlists.ui {
 			s.graphics.drawRect(0, 0, 200, 100);
 			s.filters = [new DropShadowFilter(2, 45, 0, .2)];
 			return s;
+		}
+
+		public static function getButton(p : DisplayObjectContainer, x : Number = 0, y : Number = 0, label : String = "", handler : Function = null) : PushButton {
+			return new PushButton(p, x, y, label, handler);
 		}
 	}
 }
