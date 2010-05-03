@@ -114,5 +114,21 @@ package eu.stefaner.elasticlists.ui {
 		public static function getButton(p : DisplayObjectContainer, x : Number = 0, y : Number = 0, label : String = "", handler : Function = null) : PushButton {
 			return new PushButton(p, x, y, label, handler);
 		}
+
+		public static function getMapMarkerBackground() : Sprite {
+			var s : Sprite = new Sprite();
+			s.graphics.beginFill(0x333333);
+			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
+			s.graphics.drawCircle(0, 0, 1);
+			return s;
+		}
+
+		public static function getMapMarkerSelectionMarker() : Sprite {
+			var s : Sprite = new Sprite();
+			s.graphics.beginFill(0xDDFF99);
+			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
+			s.graphics.drawCircle(0, 0, 1);
+			return s;
+		}
 	}
 }
