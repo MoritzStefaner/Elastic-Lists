@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<facets>
+	
+	<!-- FACET VALUE TEMPLATE -->
+<!--
+		<facetValue>
+			<label>$1</label>
+			<name>$1</name>
+			<subValues>
+				
+			</subValues>
+		</facetValue>
+
+-->
+
+	<!-- MEDIA TYPE -->
+
+	<facet>
+		<!-- 
+			type: nominal, ordinal, date, geolocation 
+			(not fully supported yet)
+		-->
+		<type>nominal</type>
+		<!-- 
+			display label
+		-->
+		<label>Media type</label>
+		<!-- 
+			variable name (used in contentItems description)
+		-->
+		<name>mediaType</name>
+		<facetValues>
+			<!-- 
+				You can specify facet values with their display labels here, 
+				but if label and ID are the same, you do not have to 
+				(they will be created automatically if they appear in contentItem facetValues)
+			-->
+			<facetValue>
+				<label>doc</label>
+				<name>doc</name>
+			</facetValue>
+			<facetValue>
+				<label>ppt</label>
+				<name>ppt</name>
+			</facetValue>
+			<facetValue>
+				<label>pdf</label>
+				<name>pdf</name>
+			</facetValue>
+			<facetValue>
+				<label>image</label>
+				<name>image</name>
+			</facetValue>
+			<facetValue>
+				<label>xls</label>
+				<name>xls</name>
+			</facetValue>
+			<facetValue>
+				<label>other</label>
+				<name>other</name>
+			</facetValue>
+		</facetValues>
+	</facet>
+
+	
+	<!-- RATING -->
+	
+	<facet>
+		<type>ordinal</type>
+		<label>Rating</label>
+		<name>rating</name>
+		<facetValues>
+			<facetValue>
+				<label>None</label>
+				<name>0</name>
+			</facetValue>
+			<facetValue>
+				<label>1</label>
+				<name>1</name>
+			</facetValue>
+			<facetValue>
+				<label>2</label>
+				<name>2</name>
+			</facetValue>
+			<facetValue>
+				<label>3</label>
+				<name>3</name>
+			</facetValue>
+			<facetValue>
+				<label>4</label>
+				<name>4</name>
+			</facetValue>
+			<facetValue>
+				<label>5</label>
+				<name>5</name>
+			</facetValue>
+		</facetValues>
+	</facet>
+
+	<!-- TAXONOMY -->	
+	<facet>
+		<type>hierarchical</type>
+		<label>Taxonomy</label>
+		<!-- variable name -->
+		<name>taxonomy</name>
+		<levelLabels>
+			<levelLabel>Level 1</levelLabel>
+			<levelLabel>Level 2</levelLabel>
+			<levelLabel>Level 3</levelLabel>
+		</levelLabels>
+		<facetValues>
+			<facetValue>
+				<label>1</label>
+				<name>1</name>
+				<facetValues>
+					<facetValue>
+						<label>1.1</label>
+						<name>1.1</name>
+						<facetValues>
+							<facetValue>
+								<label>1.1.1</label>
+								<name>1.1.1</name>
+							</facetValue>
+						</facetValues>
+					</facetValue>
+					<facetValue>
+						<label>1.2</label>
+						<name>1.2</name>
+					</facetValue>
+					<facetValue>
+						<label>1.3</label>
+						<name>1.3</name>
+					</facetValue>
+				</facetValues>
+			</facetValue>
+			<facetValue>
+				<label>2</label>
+				<name>2</name>
+			</facetValue>
+			<facetValue>
+				<label>3</label>
+				<name>3</name>
+			</facetValue>
+		</facetValues>
+	</facet>	
+	
+	<!-- Geo -->
+	
+	<facet>
+		<type>geolocation</type>
+		<label>Location</label>
+		<name>geo</name>
+		<facetValues />
+	</facet>
+</facets>
