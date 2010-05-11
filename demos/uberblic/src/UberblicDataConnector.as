@@ -65,12 +65,11 @@ package {
 			
 			for (var facetName:String in response.facets) {
 				// get facet
-				var f : Facet = model.getFacetByName(facetName);
+				var f : Facet = model.facet(facetName);
 				
 				if(f == null) {
 					// create facet if necessary
-					f = model.createFacet(facetName);
-					f.label = facetName;
+					f = model.registerFacet(new Facet(facetName));
 				}
 			
 				var facetValue : FacetValue;
@@ -82,7 +81,7 @@ package {
 				
 				// loop through results and adopt values
 				for each(var facetValueItem:Object in response.facets[facetName]) {
-					facetValue = f.getFacetValueByName(facetValueItem.res_id);
+					facetValue = f.facetValue(facetValueItem.res_id);
 					if(!facetValue) {
 						// create value if necessary
 						facetValue = f.createFacetValue(facetValueItem.res_id);

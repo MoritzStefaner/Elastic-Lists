@@ -16,11 +16,13 @@ limitations under the License.
    
  */
 
-package eu.stefaner.elasticlists.data {		import eu.stefaner.elasticlists.App;
+package eu.stefaner.elasticlists.data {	
+	import eu.stefaner.elasticlists.App;
 
 	import org.osflash.thunderbolt.Logger;
 
-	import flash.events.EventDispatcher;	import flash.utils.Dictionary;
+	import flash.events.EventDispatcher;
+	import flash.utils.Dictionary;
 
 	/**	 *  Model	 *		 *	manages ContentItem and Facet collections, filter states etc	 *		 * 	@langversion ActionScript 3	 *	@playerversion Flash 9.0.0	 *	 *	@author moritz@stefaner.eu	 */	public class Model extends EventDispatcher {
 
@@ -30,12 +32,14 @@ package eu.stefaner.elasticlists.data {		import eu.stefaner.elasticlists.App;
 
 		public function hasActiveFilters() : Boolean {			return !(filteredContentItems.length == allContentItems.length);		}
 
-		// adds a facet		// REVISIT: could overwrite pre-existing facet with same name in lookup maps!		public function addFacet(f : Facet) : Facet {			facets.push(f);			// prepare lookup map per facet value			for each (var facetValue:FacetValue in f.facetValues) {				allContentItemsForFacetValue[facetValue] = [];			}			return f;		}
+		// adds a facet		public function registerFacet(f : Facet) : Facet {			if(facet(f.name)) {
+				throw new Error("Cannot add facet, because it is already present: " + f.name);
+				return;
+			}
+			f.model = this;
+			facets.push(f);			// prepare lookup map per facet value			for each (var facetValue:FacetValue in f.facetValues) {				allContentItemsForFacetValue[facetValue] = [];			}			return f;		}
 
-		public function createFacet(name : String, type : String = "") : Facet {			if(getFacetByName(name)) {				throw new Error("Cannot add facet, because it is already present: " + name);				return;			}						switch(type) {			/*
-				case  :				return addFacet(new HierarchicalFacet(this, name));												case "date" :				return addFacet(new DateFacet(name));				 */	 				case Facet.GEO :					return addFacet(new GeoFacet(this, name));				default:					return addFacet(new Facet(this, name));			}			 			 			return addFacet(new Facet(this, name));		};
-
-		// returns a facet by name		public function getFacetByName(name : String) : Facet {			for each(var facet:Facet in facets) {				if (facet.name == name) {					return facet;				}			}			return null;						}
+		// returns a facet by name		public function facet(name : String) : Facet {			for each(var facet:Facet in facets) {				if (facet.name == name) {					return facet;				}			}			return null;						}
 
 		public function updateGlobalFacetStats() : void {			for each (var facet:Facet in facets) {				facet.calcGlobalStats();			}		}
 
@@ -51,7 +55,9 @@ package eu.stefaner.elasticlists.data {		import eu.stefaner.elasticlists.App;
 
 		// adds a content items		private function addContentItem(c : ContentItem) : ContentItem {			if(!contentItemsById[c.id]) {				allContentItems.push(c);				contentItemsById[c.id] = c;				facetValuesForContentItem[c] = new Array();				return c;				} else {				// TODO: adopt new values?				return contentItemsById[c.id]; 			}		};
 
-		// short cut function with a lengthy name		// will create facet value if necessary!		public function assignFacetValueToContentItemByName(contentItemId : String, facetName : String, facetValueName : String) : void {			var contentItem : ContentItem = getContentItemById(contentItemId);			var facet : Facet = getFacetByName(facetName);			var facetValue : FacetValue = facet.getFacetValueByName(facetValueName);			if(facetValueName == null) {				throw new Error("facetValueName cannot be null");			}			if(facetValue == null) {				facetValue = facet.createFacetValue(facetValueName);			}			assignFacetValueToContentItem(facetValue, contentItem);		}		
+		// short cut function with a lengthy name		// will create facet value if necessary!		public function assignFacetValueToContentItemByName(contentItemOrId : *, facetName : String, facetValueName : String) : void {
+			var contentItem:ContentItem = (contentItemOrId as ContentItem) || getContentItemById(contentItemOrId);
+			var facet : Facet = facet(facetName);			var facetValue : FacetValue = facet.facetValue(facetValueName);			if(facetValueName == null) {				throw new Error("facetValueName cannot be null");			}			if(facetValue == null) {				facetValue = facet.createFacetValue(facetValueName);			}			assignFacetValueToContentItem(facetValue, contentItem);		}		
 
 		// REVISIT: lookup should be moved to Facet object		public function assignFacetValueToContentItem(f : FacetValue, c : ContentItem) : void {			if(f == null || c == null) {				throw new Error("*** NULL VALUE: assignFacetValueToContentItem " + f + " " + c);			}									if(allContentItemsForFacetValue[f] == undefined) {				allContentItemsForFacetValue[f] = [];			}						allContentItemsForFacetValue[f].push(c);			facetValuesForContentItem[c].push(f);						/*			// check if facetValue is hierarchical and has a parent			var ff : HierarchicalFacetValue = f as HierarchicalFacetValue;			if(ff != null && ff.hasParent()) {				assignFacetValueToContentItem(ff.parentFacetValue, c);			}			 * 			 */		};	
 

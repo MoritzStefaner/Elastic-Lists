@@ -71,7 +71,7 @@ package {
 			hBox.spacing = margin * .33;
 			var facetNames : Array = ["prize", "gender", "country", "decade", "year"];
 			for each (var fn:String in facetNames) {
-				var facet : Facet = model.getFacetByName(fn);
+				var facet : Facet = model.facet(fn);
 				var f : FacetBoxContainer = new FacetBoxContainer(this);
 				var facetBox : FacetBox;
 				facetBox = new ElasticListBox();

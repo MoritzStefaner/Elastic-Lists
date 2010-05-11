@@ -1,20 +1,20 @@
- /*
+/*
    
-  Copyright 2010, Moritz Stefaner
+Copyright 2010, Moritz Stefaner
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
    
-*/
+ */
 
 package {
 	import eu.stefaner.elasticlists.data.ContentItem;
@@ -44,17 +44,18 @@ package {
 			Logger.info("data loaded");
 			var f : Facet ; 
 			
-			f = model.createFacet("year");
+			f = model.registerFacet(new Facet("year"));
 			f.sortFields = ["label"];
 			f.sortOptions = Array.NUMERIC | Array.DESCENDING;
 			
-			f = model.createFacet("decade");
+			f = model.registerFacet(new Facet("decade"));
 			f.sortFields = ["label"];
 			f.sortOptions = Array.NUMERIC | Array.DESCENDING;
 			
-			model.createFacet("country");
-			model.createFacet("gender");
-			model.createFacet("prize");
+			model.registerFacet(new Facet("country"));
+			model.registerFacet(new Facet("gender"));
+			model.registerFacet(new Facet("prize"));
+			
 			var entries : Array = e.target.data.split("\n\n");
 			for each (var entry:String in entries) {
 				parseContentItemString(entry);
@@ -73,7 +74,7 @@ package {
 				var value : String = a[1];
 				var facet : Facet;
 				
-				if(facet = model.getFacetByName(key)) {
+				if(facet = model.facet(key)) {
 					// field belongs to a facet
 					// wll create facet value if needed
 					model.assignFacetValueToContentItemByName(c.id, facet.name, value);
