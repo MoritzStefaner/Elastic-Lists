@@ -130,5 +130,30 @@ package eu.stefaner.elasticlists.ui {
 			s.graphics.drawCircle(0, 0, 1);
 			return s;
 		}
+
+		public static function getSliderFacetBoxElementBackground() : Sprite {
+			var s : Sprite = new Sprite();
+			s.graphics.beginFill(0xFFFFFF);
+			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
+			s.graphics.drawRect(0, 0, 200, 100);
+			return s;
+		}
+
+		public static function getSliderFacetBoxElementLocalBar() : Sprite {
+			var s : Sprite = new Sprite();
+			s.graphics.beginFill(0xF0F0F0);
+			s.graphics.lineStyle(0, 0xCCCCCC, 1);
+			s.graphics.drawRect(-1, -2, 2, 2);
+			s.filters = [new DropShadowFilter(0, 45, 0, .2)];
+			return s;
+		}
+
+		public static function getSliderFacetBoxElementGlobalBar() : Sprite {
+			var s : Sprite = new Sprite();
+			s.graphics.beginFill(0xBBBBBB);
+			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
+			s.graphics.drawRect(-1, -2, 2, 2);
+			return s;
+		}
 	}
 }
