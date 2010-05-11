@@ -16,7 +16,7 @@
    
 */
 
-package eu.stefaner.elasticlists.data {		/**	 * 	ContentItem 	 * 	 * 	data object representing a content item / search result etc.	 *	 *	@langversion ActionScript 3.0	 *	@playerversion Flash 9.0	 *	 *	@author moritz@stefaner.eu	 */	import flash.utils.Dictionary;	public class ContentItem extends DataItem {		// stores facet values (FacetValue objects) by facet (Facet object)
+package eu.stefaner.elasticlists.data {		/**	 * 	ContentItem 	 * 	 * 	data object representing a content item / search result etc.	 *	 *	@langversion ActionScript 3.0	 *	@playerversion Flash 9.0	 *	 *	@author moritz@stefaner.eu	 */	import flash.utils.Dictionary;	public class ContentItem extends DataItem {		// stores assigned facet values (FacetValue objects)
 		public var facetValues:Dictionary;		// stores raw values, unparsed vales and additional info (title, description etc.)		public var rawValues:Object;		// title
 		public var title:String;		// unique id		public var id:String;		// url		// ?		public var url:String;		//	CONSTRUCTOR:
 		public function ContentItem(id:String) {			this.id = id;			facetValues = new Dictionary(true);			rawValues = new Object();					}
