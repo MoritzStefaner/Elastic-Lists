@@ -56,12 +56,12 @@ package {
 			
 			vBox = new VBox(this, margin, margin);
 			vBox.spacing = margin;
+
+			titleTextField = DefaultGraphicsFactory.getTitleTextField();
+			titleTextField.scaleX = titleTextField.scaleY = 2;
+			vBox.addChild(titleTextField);
 			
-			var tf : TextField = DefaultGraphicsFactory.getTitleTextField();
-			tf.text = "Nobel prize winners 1901 - 2004";
-			tf.scaleX = tf.scaleY = 2;
-			
-			vBox.addChild(tf);
+			title = "Nobel prize winners 1901 - 2004";
 			
 			hBox = new HBox(vBox, 0, 0);
 			hBox.spacing = margin * .33;
