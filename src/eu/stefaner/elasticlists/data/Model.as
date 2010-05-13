@@ -65,7 +65,7 @@ package eu.stefaner.elasticlists.data {
 
 		// gets selected filters from facets, stores them in activeFilters dict		public function updateActiveFilters() : void {			activeFilters = new Dictionary();			for each(var facet:Facet in facets) {
 				facet.updateContentItemFilter();
-				if(facet.contentItemFilter.active) activeFilters[facet] = facet.contentItemFilter;			}		};
+				if(facet.filter.active) activeFilters[facet] = facet.filter;			}		};
 
 		// updates ContentItem states, filteredContentItems based on filters		public function applyFilters() : void {			trace("Model.applyFilters");						updateActiveFilters();			var c : ContentItem;
 						filteredContentItems = [];											for each(c in allContentItems) {				if(contentItemMatchesFilters(c, activeFilters)) {					c.filteredOut = false;					filteredContentItems.push(c);				} else {					c.filteredOut = true;				}			}						Logger.info("Model. onFilteredContentItemsChanged: " + filteredContentItems.length + " results");		};

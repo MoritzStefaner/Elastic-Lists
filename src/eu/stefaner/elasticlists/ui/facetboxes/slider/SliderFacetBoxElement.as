@@ -41,6 +41,7 @@ package eu.stefaner.elasticlists.ui.facetboxes.slider {
 				localBar = DefaultGraphicsFactory.getSliderFacetBoxElementLocalBar();
 				addChild(localBar);
 			}
+			bg.alpha = 0;
 		}
 
 		protected function layout() : void {
@@ -75,8 +76,8 @@ package eu.stefaner.elasticlists.ui.facetboxes.slider {
 		}
 
 		override public function updateStats() : void {
-			container.transitioner.$(localBar).height = facetValue.localRatio * (height - 18);
-			container.transitioner.$(globalBar).height = facetValue.globalRatio * (height - 18);
+			container.transitioner.$(localBar).height = facetValue.localRatio * (height - 18 - 5);
+			container.transitioner.$(globalBar).height = facetValue.globalRatio * (height - 18 - 5);
 		}
 	}
 }

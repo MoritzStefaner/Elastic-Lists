@@ -6,6 +6,7 @@ package eu.stefaner.elasticlists.data {
 	public class Filter {
 
 		public var values : Array = [];
+		public var conjunctive : Boolean = Model.ANDselectionWithinFacets;
 
 		public function Filter() {
 		}
@@ -16,14 +17,14 @@ package eu.stefaner.elasticlists.data {
 			}
 
 			for each(var facetValue:FacetValue in values) {
-				if(Model.ANDselectionWithinFacets && !c.facetValues[facetValue]) {
+				if(conjunctive && !c.facetValues[facetValue]) {
 					return false;
-				} else if(!Model.ANDselectionWithinFacets && c.facetValues[facetValue]) {
+				} else if(!conjunctive && c.facetValues[facetValue]) {
 					return true;
 				}
 			}
 
-			return Model.ANDselectionWithinFacets;
+			return conjunctive;
 		};
 
 		public function clear() : void {
