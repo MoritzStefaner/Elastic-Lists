@@ -1,0 +1,25 @@
+
+You can find the open source version of Moritz Stefaner's "Elastic Lists":http://moritz.stefaner.eu/projects/elastic-lists/ project here. It is an ActionScript 3 project that can be compiled without Adobe Flash, but requires the Flex framework for some dependencies in the libraries used.
+
+h2. License
+
+The sources are available under an "Apache 2.0 license":http://www.apache.org/licenses/LICENSE-2.0.html
+
+h2. Frameworks and libraries
+
+The distribution makes use of and includes also the following open source libraries (please respect the respective licenses): 
+* "flare":http://flare.prefuse.org : The checked-in variant fixes some bugs and makes flare apps compilable also from Flash
+* "bulkloader":http://code.google.com/p/bulk-loader/
+* "minimalcomps":http://www.minimalcomps.com/
+* "thunderbolt":http://code.google.com/p/flash-thunderbolt/wiki/ThunderBoltAS3
+
+h2. Fonts
+
+In addition, the following free fonts are used
+* "PT Sans":http://www.fontsquirrel.com/fonts/PT-Sans
+* "Aller":http://www.fontsquirrel.com/fonts/Aller
+
+h2. FAQ
+
+__The demos do not seem to work?__
+Do you have Flash Player 10 installed? Also, make sure to allow local access to the data files with the "Security Settings Manager":http://macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html
