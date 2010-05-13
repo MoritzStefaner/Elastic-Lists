@@ -26,14 +26,14 @@ package {
 			Logger.info("data loaded");
 			var f : Facet ; 
 			
-			f = model.createFacet("position");
+			f = model.registerFacet(new Facet("position"));
 			f.sortFields = ["label"];
 			f.sortOptions = Array.NUMERIC;
 			
-			f = model.createFacet("location");
+			f = model.registerFacet(new Facet("location"));
 			
-			model.createFacet("tag");
-			model.createFacet("listeners");
+			model.registerFacet(new Facet("tag"));
+			model.registerFacet(new Facet("listeners"));
 		
 			var xml : XML = new XML(e.target.data);
 			for each (var artistXML:XML in xml..artist) {
@@ -159,7 +159,8 @@ package {
 				var value : String = a[1];
 				var facet : Facet;
 				
-				if(facet = model.getFacetByName(key)) {
+				if(model.facet(key)) {
+					facet = model.facet(key); 
 					// field belongs to a facet
 					// wll create facet value if needed
 					model.assignFacetValueToContentItemByName(c.id, facet.name, value);
