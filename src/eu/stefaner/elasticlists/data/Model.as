@@ -55,10 +55,13 @@ package eu.stefaner.elasticlists.data {
 		}
 
 		// adds a facet
-		// REVISIT: could overwrite pre-existing facet with same name in lookup maps!
-		public function addFacet(f : Facet) : Facet {
+		public function registerFacet(f : Facet) : Facet {
+			if(facet(f.name)) {
+				throw new Error("Cannot add facet, because it is already present: " + f.name);
+				return;
+			}
+			f.model = this;
 			facets.push(f);
-
 			// prepare lookup map per facet value
 			for each (var facetValue:FacetValue in f.facetValues) {
 				allContentItemsForFacetValue[facetValue] = [];
@@ -67,32 +70,8 @@ package eu.stefaner.elasticlists.data {
 			return f;
 		}
 
-		public function createFacet(name : String, type : String = "") : Facet {
-			if(getFacetByName(name)) {
-				throw new Error("Cannot add facet, because it is already present: " + name);
-				return;
-			}
-			
-			switch(type) {
-			/*
-				case  :
-				return addFacet(new HierarchicalFacet(this, name));				
-				
-				case "date" :
-				return addFacet(new DateFacet(name));
-				 */	 
-				case Facet.GEO :
-					return addFacet(new GeoFacet(this, name));
-				default:
-					return addFacet(new Facet(this, name));
-			}
-			 
-			 
-			return addFacet(new Facet(this, name));
-		};
-
 		// returns a facet by name
-		public function getFacetByName(name : String) : Facet {
+		public function facet(name : String) : Facet {
 			for each(var facet:Facet in facets) {
 				if (facet.name == name) {
 					return facet;
@@ -101,13 +80,13 @@ package eu.stefaner.elasticlists.data {
 			return null;				
 		}
 
-		public function updateGlobalFacetStats() : void {
+		public function updateGlobalStats() : void {
 			for each (var facet:Facet in facets) {
 				facet.calcGlobalStats();
 			}
 		}
 
-		public function updateLocalFacetStats() : void {
+		public function updateLocalStats() : void {
 			for each (var facet:Facet in facets) {
 				facet.calcLocalStats();
 			}
@@ -151,10 +130,10 @@ package eu.stefaner.elasticlists.data {
 
 		// short cut function with a lengthy name
 		// will create facet value if necessary!
-		public function assignFacetValueToContentItemByName(contentItemId : String, facetName : String, facetValueName : String) : void {
-			var contentItem : ContentItem = getContentItemById(contentItemId);
-			var facet : Facet = getFacetByName(facetName);
-			var facetValue : FacetValue = facet.getFacetValueByName(facetValueName);
+		public function assignFacetValueToContentItemByName(contentItemOrId : *, facetName : String, facetValueName : String) : void {
+			var contentItem : ContentItem = (contentItemOrId as ContentItem) || getContentItemById(contentItemOrId);
+			var facet : Facet = facet(facetName);
+			var facetValue : FacetValue = facet.facetValue(facetValueName);
 			if(facetValueName == null) {
 				throw new Error("facetValueName cannot be null");
 			}
@@ -176,7 +155,7 @@ package eu.stefaner.elasticlists.data {
 			
 			allContentItemsForFacetValue[f].push(c);
 			facetValuesForContentItem[c].push(f);
-			
+			c.facetValues[f] = true;
 			/*
 			// check if facetValue is hierarchical and has a parent
 			var ff : HierarchicalFacetValue = f as HierarchicalFacetValue;
@@ -203,10 +182,8 @@ package eu.stefaner.elasticlists.data {
 		public function updateActiveFilters() : void {
 			activeFilters = new Dictionary();
 			for each(var facet:Facet in facets) {
-				var filter : Array = facet.getSelectedFacetValues();
-				if(filter.length) {
-					activeFilters[facet] = filter;
-				}
+				facet.updateContentItemFilter();
+				if(facet.filter.active) activeFilters[facet] = facet.filter;
 			}
 		};
 
@@ -217,72 +194,24 @@ package eu.stefaner.elasticlists.data {
 			updateActiveFilters();
 			var c : ContentItem;
 			
-			// FIXME: length == 0 for dictionary ??
-			if(activeFilters.length == 0) {
-				// All items visible
-				// that was easy
-				filteredContentItems = allContentItems;
-				for each(c in allContentItems) {
-					c.filteredOut = false;
-				}
-			} else {
-
-				// filter out non-matching items				
-				filteredContentItems = [];				
+			filteredContentItems = [];				
 				
-				for each(c in allContentItems) {
-					if(contentItemMatchesFilters(c, activeFilters)) {
-						c.filteredOut = false;
-						filteredContentItems.push(c);
-					} else {
-						c.filteredOut = true;
-					}
+			for each(c in allContentItems) {
+				if(contentItemMatchesFilters(c, activeFilters)) {
+					c.filteredOut = false;
+					filteredContentItems.push(c);
+				} else {
+					c.filteredOut = true;
 				}
 			}
+			
 			Logger.info("Model. onFilteredContentItemsChanged: " + filteredContentItems.length + " results");
 		};
 
-		// tests if a contentitem matches all filters in passed filters dictionary at least once per type 
-		// (AND conjunction of OR queries within one facet)
+		// tests if a contentitem matches all filters in passed filters dictionary 
 		protected function contentItemMatchesFilters(c : ContentItem, filters : Dictionary) : Boolean {
-			
-			var facetValues : Array = facetValuesForContentItem[c];
-			var f2 : FacetValue;
-			for each(var a:Array in filters) {
-				// for all facets
-				var found : Boolean = false;
-				for each(var filter:FacetValue in a) {
-					if(!ANDselectionWithinFacets) {
-						// for all values in facet filter
-						for each(f2 in facetValues) {
-							// check if present in facetValues of contentitem
-							if(filter == f2) {
-								found = true;
-								break;
-							}
-						}
-						if(found) {
-							break;
-						}
-					} else {
-						found = false;
-						// for all values in facet filter
-						for each(f2 in facetValues) {
-							// check if present in facetValues of contentitem
-							if(filter == f2) {
-								found = true;
-								break;
-							}
-						}
-						if(!found) {
-							break;
-						}
-					}
-				}
-				// we found a non-matching filter -> abort				
-				if(!found) {
-					return false;
-				}
+			for each(var f:Filter in filters) {
+				if(!f.match(c)) return false;				
 			}	
 			// all good
 			return true;

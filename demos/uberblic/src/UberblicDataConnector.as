@@ -1,20 +1,20 @@
- /*
+/*
    
-  Copyright 2010, Moritz Stefaner
+Copyright 2010, Moritz Stefaner
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
    
-*/
+ */
 
 package {
 	import eu.stefaner.elasticlists.data.AsyncModel;
@@ -50,7 +50,7 @@ package {
 			for (var f:* in model.activeFilters) {
 				url += "%20" + f.name + ":[";
 				var a : Array = [];
-				for each (var fv:FacetValue in model.activeFilters[f]) {
+				for each (var fv:FacetValue in model.activeFilters[f].values) {
 					a.push(fv.name);
 				}
 				url += a.toString() + "]";
@@ -65,12 +65,11 @@ package {
 			
 			for (var facetName:String in response.facets) {
 				// get facet
-				var f : Facet = model.getFacetByName(facetName);
+				var f : Facet = model.facet(facetName);
 				
 				if(f == null) {
 					// create facet if necessary
-					f = model.createFacet(facetName);
-					f.label = facetName;
+					f = model.registerFacet(new Facet(facetName));
 				}
 			
 				var facetValue : FacetValue;
@@ -82,7 +81,7 @@ package {
 				
 				// loop through results and adopt values
 				for each(var facetValueItem:Object in response.facets[facetName]) {
-					facetValue = f.getFacetValueByName(facetValueItem.res_id);
+					facetValue = f.facetValue(facetValueItem.res_id);
 					if(!facetValue) {
 						// create value if necessary
 						facetValue = f.createFacetValue(facetValueItem.res_id);

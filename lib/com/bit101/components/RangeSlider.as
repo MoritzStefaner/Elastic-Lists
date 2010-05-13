@@ -34,8 +34,9 @@ package com.bit101.components
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	
-	public class RangeSlider extends Component
-	{
+	public class RangeSlider extends Component {
+		
+		
 		protected var _back:Sprite;
 		protected var _highLabel:Label;
 		protected var _highValue:Number = 100;
@@ -61,7 +62,8 @@ package com.bit101.components
 		public static const TOP:String = "top";
 		public static const VERTICAL:String = "vertical";
 		
-		
+		// added by mo, for event dispatch on drag release
+		public static const DRAG_END : String = "DRAG_END";
 		
 		/**
 		 * Constructor
@@ -329,6 +331,8 @@ package com.bit101.components
 				_lowLabel.visible = false;
 				_highLabel.visible = false;
 			}
+			// added by mo
+			dispatchEvent(new Event(DRAG_END));
 		}
 		
 		/**
