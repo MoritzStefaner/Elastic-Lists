@@ -94,7 +94,6 @@ package eu.stefaner.elasticlists.ui.facetboxes {
 				addChild(title_tf);
 			}
 			/*
-			 // TODO: show only when filters are active, uncommented for now
 			if(!resetButton) {
 				resetButton = DefaultGraphicsFactory.getButton(this, 0, 0, "reset");
 				resetButton.width = 40;

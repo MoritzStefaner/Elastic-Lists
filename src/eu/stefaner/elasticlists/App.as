@@ -43,8 +43,6 @@ package eu.stefaner.elasticlists {
 	import flash.events.Event;
 	import flash.text.TextField;
 
-	[SWF(backgroundColor="#EEEEEE", frameRate="31", width="1024", height="768")]
-
 	/**
 	 * App
 	 *
@@ -157,7 +155,6 @@ package eu.stefaner.elasticlists {
 			vBox.spacing = margin;
 			
 			titleTextField = DefaultGraphicsFactory.getTitleTextField();
-			titleTextField.text = "Elastic Lists test application";
 			titleTextField.scaleX = titleTextField.scaleY = 2;
 			if(loaderInfo.parameters.appTitle) {
 				title = loaderInfo.parameters.appTitle; 
