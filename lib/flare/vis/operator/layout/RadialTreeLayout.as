@@ -261,7 +261,7 @@ package flare.vis.operator.layout {
 		private function sortedChildren(n : NodeSprite) : Vector.<NodeSprite> {
 			var cc : int = n.childDegree;
 			if (cc == 0) return new Vector.<NodeSprite>();
-			var angleIndices : Vector.<Number> = new Vector.<Number>(cc);
+			var angleIndices : Array = [];
 			var angles : Vector.<NodeSprite> = new Vector.<NodeSprite>(cc);
 	        
 			if (_sortAngles) {
