@@ -63,7 +63,6 @@ package {
 			dispatchEvent(new Event(DATA_LOADED));
 		}
 
-		private var idCounter : Number = 0;
 
 		private function parseContentItemString(entry : String) : void {
 			var keyValueStrings : Array = entry.split("\n");
