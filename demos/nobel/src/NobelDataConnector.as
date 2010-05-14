@@ -63,7 +63,6 @@ package {
 			dispatchEvent(new Event(DATA_LOADED));
 		}
 
-
 		private function parseContentItemString(entry : String) : void {
 			var keyValueStrings : Array = entry.split("\n");
 			var c : ContentItem = model.createContentItem(String(idCounter++));
@@ -71,9 +70,8 @@ package {
 				var a : Array = keyValueString.split(": ");
 				var key : String = a[0];
 				var value : String = a[1];
-				var facet : Facet;
-				
-				if(facet = model.facet(key)) {
+				var facet : Facet = model.facet(key);
+				if(facet) {
 					// field belongs to a facet
 					// wll create facet value if needed
 					model.assignFacetValueToContentItemByName(c.id, facet.name, value);

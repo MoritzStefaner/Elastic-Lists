@@ -27,9 +27,8 @@ package {
 
 	import flash.events.Event;
 
-	/**
-	 * @author mo
-	 */
+	[SWF(backgroundColor="#DDDDDD", frameRate="31", width="1024", height="768")]
+
 	public class UberblicElasticListsApp extends App {
 
 		private var firstRun : Boolean = true;

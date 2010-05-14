@@ -17,7 +17,6 @@ limitations under the License.
  */
 
 package eu.stefaner.elasticlists {
-	import flash.external.ExternalInterface;
 	import eu.stefaner.elasticlists.data.ContentItem;
 	import eu.stefaner.elasticlists.data.DataConnector;
 	import eu.stefaner.elasticlists.data.Facet;
