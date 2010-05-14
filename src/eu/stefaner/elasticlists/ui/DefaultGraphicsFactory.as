@@ -120,8 +120,9 @@ package eu.stefaner.elasticlists.ui {
 
 		public static function getMapMarkerBackground() : Sprite {
 			var s : Sprite = new Sprite();
-			s.graphics.beginFill(0x333333);
-			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
+			s.graphics.beginFill(0xFFFFFF);
+			//s.graphics.lineStyle(0, 0xCCCCCC, 1, false, "none");
+			//s.filters = [new DropShadowFilter(2, 45, 0, .2)];
 			s.graphics.drawCircle(0, 0, 1);
 			return s;
 		}

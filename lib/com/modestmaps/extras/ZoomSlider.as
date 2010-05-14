@@ -1,7 +1,18 @@
 package com.modestmaps.extras {
-	
-    import com.modestmaps.Map;    import com.modestmaps.events.MapEvent;        import flash.display.Sprite;    import flash.events.Event;    import flash.events.MouseEvent;    import flash.filters.BevelFilter;    import flash.filters.BitmapFilterType;    import flash.filters.DropShadowFilter;    import flash.geom.Point;    import flash.geom.Rectangle;        import gs.TweenLite;    
+	import com.greensock.TweenMax;
+	import com.modestmaps.Map;
+	import com.modestmaps.events.MapEvent;
 
+	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.events.MouseEvent;
+	import flash.filters.BevelFilter;
+	import flash.filters.BitmapFilterType;
+	import flash.filters.DropShadowFilter;
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
+
+	
 	/** This is an example of a slider that modifies the zoom level of the given map.
 	 * 
 	 *  It is provided mainly for ModestMapsSample.as and to test the arbitrary 
@@ -65,7 +76,7 @@ package com.modestmaps.extras {
 		{
 			var p:Point = globalToLocal(new Point(event.stageX, event.stageY));
 			thumb.y = p.y;
-			TweenLite.to(map.grid, 0.25, { zoomLevel: Math.round(map.grid.minZoom + (map.grid.maxZoom - map.grid.minZoom) * (1 - proportion)) }); 
+			TweenMax.to(map.grid, 0.25, { zoomLevel: Math.round(map.grid.minZoom + (map.grid.maxZoom - map.grid.minZoom) * (1 - proportion)) }); 
 		}
         
 		private function onThumbMouse(event:Event):void
@@ -83,7 +94,7 @@ package com.modestmaps.extras {
 			else if (event.type == MouseEvent.MOUSE_UP || event.type == Event.MOUSE_LEAVE) {
 				thumb.stopDrag();
 				dragging = false;
-				TweenLite.to(map.grid, 0.1, { zoomLevel: Math.round(map.grid.zoomLevel) });
+				TweenMax.to(map.grid, 0.1, { zoomLevel: Math.round(map.grid.zoomLevel) });
 				stage.removeEventListener(MouseEvent.MOUSE_UP, onThumbMouse);
 				stage.removeEventListener(MouseEvent.MOUSE_MOVE, onThumbMouse);
 				stage.removeEventListener(Event.MOUSE_LEAVE, onThumbMouse);

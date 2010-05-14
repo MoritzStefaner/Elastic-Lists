@@ -7,21 +7,19 @@
  * com.modestmaps.TweenMap adds smooth animated panning and zooming to the basic Map class
  *
  */
-package com.modestmaps
-{
+package com.modestmaps {
+	import com.greensock.TweenMax;
 	import com.modestmaps.core.Coordinate;
 	import com.modestmaps.core.MapExtent;
 	import com.modestmaps.core.TweenTile;
 	import com.modestmaps.geo.Location;
 	import com.modestmaps.mapproviders.IMapProvider;
-	
+
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
-	
-	import gs.TweenLite;
-	
-    public class TweenMap extends Map
+
+	public class TweenMap extends Map
 	{
 
 		/** easing function used for panLeft, panRight, panUp, panDown */
@@ -62,7 +60,7 @@ package com.modestmaps
 	    {
 	    	if (!grid.panning && !grid.zooming) {
 		    	grid.prepareForPanning();
-	    	    TweenLite.to(grid, panDuration, { tx: grid.tx+px, ty: grid.ty+py, onComplete: grid.donePanning, ease: panEase });
+	    	    TweenMax.to(grid, panDuration, { tx: grid.tx+px, ty: grid.ty+py, onComplete: grid.donePanning, ease: panEase });
 	    	}
 	    }      
 		    
@@ -103,7 +101,7 @@ package com.modestmaps
 			m.scale(sc, sc);
 			m.translate(targetPoint.x, targetPoint.y);
 			
-			TweenLite.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete });
+			TweenMax.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete });
         }
 
 		/** zoom in or out by zoomDelta, keeping the requested point in the same place */        
@@ -135,7 +133,7 @@ package com.modestmaps
 			m.scale(sc, sc);
 			m.translate(targetPoint.x, targetPoint.y);
 			
-			TweenLite.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete }); 
+			TweenMax.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete }); 
         }
         
         /** EXPERIMENTAL! */
@@ -158,11 +156,11 @@ package com.modestmaps
 			m.scale(sc, sc);
 			m.translate(mapWidth/2, mapHeight/2);
 			
-			TweenLite.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete, ease: panEase });
+			TweenMax.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete, ease: panEase });
         }
 
 		/** call grid.donePanning() and grid.doneZooming(), used by tweenExtent, 
-		 *  panAndZoomBy and zoomByAbout as a TweenLite onComplete function */
+		 *  panAndZoomBy and zoomByAbout as a TweenMax onComplete function */
 		protected function panAndZoomComplete():void
 		{
 			grid.donePanning();
@@ -190,7 +188,7 @@ package com.modestmaps
 	    		var pan:Point = centerPoint.subtract(p);
 
 	    		// grid.prepareForPanning();
-	    		TweenLite.to(grid, panDuration, {ty: grid.ty + pan.y,
+	    		TweenMax.to(grid, panDuration, {ty: grid.ty + pan.y,
 	    		                                 tx: grid.tx + pan.x,
 	    		                                 ease: panEase,
 	    		                                 onStart: grid.prepareForPanning,
@@ -212,7 +210,7 @@ package com.modestmaps
 		{
     		var pan:Point = new Point(mapWidth/2, mapHeight/2).subtract(locationPoint(location,grid));
     		// grid.prepareForPanning();
-    		TweenLite.to(grid, duration, { ty: grid.ty + pan.y,
+    		TweenMax.to(grid, duration, { ty: grid.ty + pan.y,
     		                               tx: grid.tx + pan.x,
     		                               ease: easing,
     		                               onStart: grid.prepareForPanning,
@@ -228,7 +226,7 @@ package com.modestmaps
 		    	var target:Number = (dir < 0) ? Math.floor(grid.zoomLevel + dir) : Math.ceil(grid.zoomLevel + dir);
 		    	target = Math.max(grid.minZoom, Math.min(grid.maxZoom, target));
 
-		    	TweenLite.to(grid, zoomDuration, { zoomLevel: target,
+		    	TweenMax.to(grid, zoomDuration, { zoomLevel: target,
 		    	                                   onStart: grid.prepareForZooming,
 		    	                                   onComplete: grid.doneZooming,
 		    	                                   ease: zoomEase });
@@ -244,8 +242,8 @@ package com.modestmaps
         {       	
         	if (!__draggable || grid.panning) return;
 
-			TweenLite.killTweensOf(grid);
-			TweenLite.killDelayedCallsTo(doneMouseWheeling);
+			TweenMax.killTweensOf(grid);
+			TweenMax.killDelayedCallsTo(doneMouseWheeling);
 
             if (event.delta < 0) {
             	var sc:Number;
@@ -275,7 +273,7 @@ package com.modestmaps
 				m.scale(sc, sc);
 				m.translate(p.x, p.y);
 				grid.setMatrix(m);            	
-	            TweenLite.delayedCall(0.1, doneMouseWheeling);
+	            TweenMax.delayedCall(0.1, doneMouseWheeling);
             }
             
             event.updateAfterEvent();
