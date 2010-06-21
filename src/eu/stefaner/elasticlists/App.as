@@ -236,6 +236,8 @@ package eu.stefaner.elasticlists {
 			
 			dispatchEvent(new Event(FILTERS_CHANGED));
 			
+			if(!contentArea) return;
+			
 			if (contentArea.selectedContentItem && contentArea.selectedContentItem.filteredOut) {
 				contentArea.selectedContentItem.selected = false;
 			}
