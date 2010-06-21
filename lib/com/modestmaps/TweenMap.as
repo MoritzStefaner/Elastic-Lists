@@ -7,19 +7,21 @@
  * com.modestmaps.TweenMap adds smooth animated panning and zooming to the basic Map class
  *
  */
-package com.modestmaps {
-	import com.greensock.TweenMax;
+package com.modestmaps
+{
 	import com.modestmaps.core.Coordinate;
 	import com.modestmaps.core.MapExtent;
 	import com.modestmaps.core.TweenTile;
 	import com.modestmaps.geo.Location;
 	import com.modestmaps.mapproviders.IMapProvider;
-
+	
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
-
-	public class TweenMap extends Map
+	
+	import gs.TweenLite;
+	
+    public class TweenMap extends Map
 	{
 
 		/** easing function used for panLeft, panRight, panUp, panDown */
@@ -60,7 +62,7 @@ package com.modestmaps {
 	    {
 	    	if (!grid.panning && !grid.zooming) {
 		    	grid.prepareForPanning();
-	    	    TweenMax.to(grid, panDuration, { tx: grid.tx+px, ty: grid.ty+py, onComplete: grid.donePanning, ease: panEase });
+	    	    TweenLite.to(grid, panDuration, { tx: grid.tx+px, ty: grid.ty+py, onComplete: grid.donePanning, ease: panEase });
 	    	}
 	    }      
 		    
@@ -70,6 +72,30 @@ package com.modestmaps {
 			return -c * (t /= d) * (t - 2) + b;
 		}
 		
+		protected var enforceToRestore:Boolean = false;
+		
+		public function tweenToMatrix(m:Matrix, duration:Number):void
+		{
+			grid.prepareForZooming();
+			grid.prepareForPanning();
+			enforceToRestore = grid.enforceBoundsEnabled;
+			grid.enforceBoundsEnabled = false;
+
+			grid.enforceBoundsOnMatrix(m);
+			
+			TweenLite.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete });			
+		}
+
+		/** call grid.donePanning() and grid.doneZooming(), used by tweenExtent, 
+		 *  panAndZoomBy and zoomByAbout as a TweenLite onComplete function */
+		protected function panAndZoomComplete():void
+		{
+			grid.enforceBoundsEnabled = enforceToRestore;
+			
+			grid.donePanning();
+			grid.doneZooming();
+		}		
+		
 		/** zoom in or out by sc, moving the given location to the requested target (or map center, if omitted) */        
         override public function panAndZoomBy(sc:Number, location:Location, targetPoint:Point=null, duration:Number=-1):void
         {
@@ -78,9 +104,6 @@ package com.modestmaps {
         	
 			var p:Point = locationPoint(location);
 			
-			grid.prepareForZooming();
-			grid.prepareForPanning();
-
 			var constrainedDelta:Number = Math.log(sc) / Math.LN2;
 
          	if (grid.zoomLevel + constrainedDelta < grid.minZoom) {
@@ -101,7 +124,7 @@ package com.modestmaps {
 			m.scale(sc, sc);
 			m.translate(targetPoint.x, targetPoint.y);
 			
-			TweenMax.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete });
+			tweenToMatrix(m, duration);
         }
 
 		/** zoom in or out by zoomDelta, keeping the requested point in the same place */        
@@ -124,16 +147,13 @@ package com.modestmaps {
 
         	var sc:Number = Math.pow(2, preciseZoomDelta);
 			
-			grid.prepareForZooming();
-			grid.prepareForPanning();
-			
 			var m:Matrix = grid.getMatrix();
 			
 			m.translate(-targetPoint.x, -targetPoint.y);
 			m.scale(sc, sc);
 			m.translate(targetPoint.x, targetPoint.y);
 			
-			TweenMax.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete }); 
+			tweenToMatrix(m, duration); 
         }
         
         /** EXPERIMENTAL! */
@@ -147,25 +167,14 @@ package com.modestmaps {
 			
 			var p:Point = grid.coordinatePoint(coord, grid);
 			
-			grid.prepareForZooming();
-			grid.prepareForPanning();
-			
 			var m:Matrix = grid.getMatrix();
 			
 			m.translate(-p.x, -p.y);
 			m.scale(sc, sc);
 			m.translate(mapWidth/2, mapHeight/2);
 			
-			TweenMax.to(grid, duration, { a: m.a, b: m.b, c: m.c, d: m.d, tx: m.tx, ty: m.ty, onComplete: panAndZoomComplete, ease: panEase });
+			tweenToMatrix(m, duration); 
         }
-
-		/** call grid.donePanning() and grid.doneZooming(), used by tweenExtent, 
-		 *  panAndZoomBy and zoomByAbout as a TweenMax onComplete function */
-		protected function panAndZoomComplete():void
-		{
-			grid.donePanning();
-			grid.doneZooming();
-		}
 
 	   /**
 		 * Put the given location in the middle of the map, animated in panDuration using panEase.
@@ -188,7 +197,7 @@ package com.modestmaps {
 	    		var pan:Point = centerPoint.subtract(p);
 
 	    		// grid.prepareForPanning();
-	    		TweenMax.to(grid, panDuration, {ty: grid.ty + pan.y,
+	    		TweenLite.to(grid, panDuration, {ty: grid.ty + pan.y,
 	    		                                 tx: grid.tx + pan.x,
 	    		                                 ease: panEase,
 	    		                                 onStart: grid.prepareForPanning,
@@ -210,7 +219,7 @@ package com.modestmaps {
 		{
     		var pan:Point = new Point(mapWidth/2, mapHeight/2).subtract(locationPoint(location,grid));
     		// grid.prepareForPanning();
-    		TweenMax.to(grid, duration, { ty: grid.ty + pan.y,
+    		TweenLite.to(grid, duration, { ty: grid.ty + pan.y,
     		                               tx: grid.tx + pan.x,
     		                               ease: easing,
     		                               onStart: grid.prepareForPanning,
@@ -226,7 +235,7 @@ package com.modestmaps {
 		    	var target:Number = (dir < 0) ? Math.floor(grid.zoomLevel + dir) : Math.ceil(grid.zoomLevel + dir);
 		    	target = Math.max(grid.minZoom, Math.min(grid.maxZoom, target));
 
-		    	TweenMax.to(grid, zoomDuration, { zoomLevel: target,
+		    	TweenLite.to(grid, zoomDuration, { zoomLevel: target,
 		    	                                   onStart: grid.prepareForZooming,
 		    	                                   onComplete: grid.doneZooming,
 		    	                                   ease: zoomEase });
@@ -238,12 +247,12 @@ package com.modestmaps {
          *
          * @see http://blog.pixelbreaker.com/flash/swfmacmousewheel/ for Mac mouse wheel support  
          */
-        public function onMouseWheel(event:MouseEvent):void
+        override public function onMouseWheel(event:MouseEvent):void
         {       	
         	if (!__draggable || grid.panning) return;
 
-			TweenMax.killTweensOf(grid);
-			TweenMax.killDelayedCallsTo(doneMouseWheeling);
+			TweenLite.killTweensOf(grid);
+			TweenLite.killDelayedCallsTo(doneMouseWheeling);
 
             if (event.delta < 0) {
             	var sc:Number;
@@ -273,8 +282,9 @@ package com.modestmaps {
 				m.scale(sc, sc);
 				m.translate(p.x, p.y);
 				grid.setMatrix(m);            	
-	            TweenMax.delayedCall(0.1, doneMouseWheeling);
             }
+            
+            TweenLite.delayedCall(0.1, doneMouseWheeling);
             
             event.updateAfterEvent();
             

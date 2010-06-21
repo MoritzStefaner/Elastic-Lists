@@ -39,6 +39,7 @@ package com.modestmaps
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.utils.getTimer;
 	
     [Event(name="startZooming",      type="com.modestmaps.events.MapEvent")]
     [Event(name="stopZooming",       type="com.modestmaps.events.MapEvent")]
@@ -58,8 +59,8 @@ package com.modestmaps
     [Event(name="markerClick",       type="com.modestmaps.events.MarkerEvent")]
     public class Map extends Sprite
 	{
-	    protected var mapWidth:Number = 320;
-	    protected var mapHeight:Number = 240;
+	    protected var mapWidth:Number;
+	    protected var mapHeight:Number;
 	    protected var __draggable:Boolean = true;
 	
 	    /** das grid */
@@ -100,7 +101,7 @@ package com.modestmaps
 	        this.mapProvider = mapProvider;
 
 			// initialize the grid (so point/location/coordinate functions should be valid after this)
-			grid = new TileGrid(mapWidth, mapHeight, draggable, mapProvider);
+			grid = new TileGrid(width, height, draggable, mapProvider);
 			grid.addEventListener(Event.CHANGE, onExtentChanged);
 	        addChild(grid);
 
@@ -166,6 +167,7 @@ package com.modestmaps
 	    */
 	    public function setExtent(extent:MapExtent):void
 	    {
+	    	//trace('applying extent', extent);
 	        onExtentChanging();
 	        // tell grid what the rock is cooking
 	        grid.resetTiles(locationsCoordinate( [ extent.northWest, extent.southEast ] ));
@@ -225,21 +227,21 @@ package com.modestmaps
 			if (!fitWidth) fitWidth = mapWidth;
 			if (!fitHeight) fitHeight = mapHeight;
 			
-	        var TL:Coordinate = mapProvider.locationCoordinate(locations[0]);
+	        var TL:Coordinate = mapProvider.locationCoordinate(locations[0].normalize());
 	        var BR:Coordinate = TL.copy();
 	        
 	        // get outermost top left and bottom right coordinates to cover all locations
 	        for (var i:int = 1; i < locations.length; i++)
 			{
-				var coordinate:Coordinate = mapProvider.locationCoordinate(locations[i]);
+				var coordinate:Coordinate = mapProvider.locationCoordinate(locations[i].normalize());
 	            TL.row = Math.min(TL.row, coordinate.row);
-				TL.column = Math.min(TL.column, coordinate.column),
+				TL.column = Math.min(TL.column, coordinate.column);
 				TL.zoom = Math.min(TL.zoom, coordinate.zoom);
-	            BR.row = Math.max(BR.row, coordinate.row),
-				BR.column = Math.max(BR.column, coordinate.column),
+	            BR.row = Math.max(BR.row, coordinate.row);
+				BR.column = Math.max(BR.column, coordinate.column);
 				BR.zoom = Math.max(BR.zoom, coordinate.zoom);
 	        }
-	
+	        
 	        // multiplication factor between horizontal span and map width
 	        var hFactor:Number = (BR.column - TL.column) / (fitWidth / mapProvider.tileWidth);
 	        
@@ -527,6 +529,40 @@ package com.modestmaps
 			grid.doneZooming();
 			grid.donePanning();
         }
+        
+        public function getRotation():Number
+        {
+        	var m:Matrix = grid.getMatrix();
+    		var px:Point = m.deltaTransformPoint(new Point(0, 1));
+			return Math.atan2(px.y, px.x);
+        }
+        
+		/** rotate to angle (radians), keeping the requested point in the same place */
+        public function setRotation(angle:Number, targetPoint:Point=null):void
+        {
+        	var rotation:Number = getRotation();
+			rotateByAbout(angle - rotation, targetPoint);        	
+        }
+        
+		/** rotate by angle (radians), keeping the requested point in the same place */
+        public function rotateByAbout(angle:Number, targetPoint:Point=null):void
+        {
+            if (!targetPoint) targetPoint = new Point(mapWidth/2, mapHeight/2);        	
+        	
+			grid.prepareForZooming();
+			grid.prepareForPanning();
+			
+			var m:Matrix = grid.getMatrix();
+			
+			m.translate(-targetPoint.x, -targetPoint.y);
+			m.rotate(angle);
+			m.translate(targetPoint.x, targetPoint.y);       	
+        	
+        	grid.setMatrix(m);
+
+			grid.doneZooming();
+			grid.donePanning();
+        }        
 	    
 		/** zoom in and put the given location in the center of the screen, or optionally at the given targetPoint */
 		public function panAndZoomIn(location:Location, targetPoint:Point=null):void
@@ -719,6 +755,22 @@ package com.modestmaps
             	}
             }
         }        
+
+		private var previousWheelEvent:Number = 0;
+		private var minMouseWheelInterval:Number = 100;
+		
+		public function onMouseWheel(event:MouseEvent):void
+		{
+			if (getTimer() - previousWheelEvent > minMouseWheelInterval) {
+				if (event.delta > 0) {
+					zoomInAbout(new Point(mouseX, mouseY), 0);
+				}
+				else if (event.delta < 0) {
+					zoomOutAbout(new Point(mouseX, mouseY), 0);
+				}
+				previousWheelEvent = getTimer(); 
+			}
+		}
 		
 	}
 }

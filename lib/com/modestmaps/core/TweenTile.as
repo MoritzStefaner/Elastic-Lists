@@ -3,9 +3,10 @@
  * $Id: TweenTile.as 722 2008-12-14 20:23:42Z tom $
  */
 
-package com.modestmaps.core {
-	import com.greensock.TweenMax;
-
+package com.modestmaps.core
+{
+	import gs.TweenLite;
+	
 	public class TweenTile extends Tile
 	{
 		public static var FADE_TIME:Number = 0.25;
@@ -20,26 +21,26 @@ package com.modestmaps.core {
 			// *** don't *** kill the tweens when hiding
 			// it seems there's a harmless bug where hide might get called after show
 			// if there's a tween running it will correct it though :)
-			//TweenMax.killTweensOf(this);
+			//TweenLite.killTweensOf(this);
 			this.alpha = 0;
 		}
 		
 		override public function show():void 
 		{
 			if (alpha < 1) {
-				TweenMax.to(this, FADE_TIME, { alpha: 1 });
+				TweenLite.to(this, FADE_TIME, { alpha: 1 });
 			}
 		}		
 
 		override public function showNow():void 
 		{
-			TweenMax.killTweensOf(this);
+			TweenLite.killTweensOf(this);
 			this.alpha = 1;
 		}		
 
 		override public function destroy():void 
 		{
-			TweenMax.killTweensOf(this);
+			TweenLite.killTweensOf(this);
 			super.destroy();
 		}		
 				

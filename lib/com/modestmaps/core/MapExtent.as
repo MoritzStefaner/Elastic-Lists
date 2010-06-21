@@ -1,5 +1,5 @@
 /*
- * $Id: MapExtent.as 706 2008-10-22 05:21:37Z allens $
+ * $Id: MapExtent.as 767 2009-02-18 01:47:40Z tom $
  */
 
 package com.modestmaps.core
@@ -159,14 +159,26 @@ package com.modestmaps.core
 		{
 			if (!locations || locations.length == 0) return new MapExtent();
 
-			var first:Location = locations[0] as Location;
-			var extent:MapExtent = new MapExtent(first.lat, first.lat, first.lon, first.lon);
-			for each (var location:Location in locations.slice(1))
+			var extent:MapExtent;
+			
+			for each (var location:Location in locations)
 			{
-				if (location) {
-					extent.enclose(location);
+				if (!extent) {
+					if (location && !isNaN(location.lat) && !isNaN(location.lon)) {
+						extent = new MapExtent(location.lat, location.lat, location.lon, location.lon);
+					}					
+				}
+				else {
+					if (location && !isNaN(location.lat) && !isNaN(location.lon)) {
+						extent.enclose(location);
+					}
 				}
 			}
+			
+			if (!extent) {
+				extent = new MapExtent()				
+			}
+			
 			return extent;
 		}
 

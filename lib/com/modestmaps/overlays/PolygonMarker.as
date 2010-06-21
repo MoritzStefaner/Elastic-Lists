@@ -5,6 +5,7 @@ package com.modestmaps.overlays
 	import com.modestmaps.core.MapExtent;
 	import com.modestmaps.core.TileGrid;
 	import com.modestmaps.geo.Location;
+	import com.modestmaps.mapproviders.IMapProvider;
 	
 	import flash.display.BitmapData;
 	import flash.display.LineScaleMode;
@@ -16,6 +17,7 @@ package com.modestmaps.overlays
 	public class PolygonMarker extends Sprite implements Redrawable
 	{
 		protected var map:Map;
+		protected var provider:IMapProvider;
 		protected var drawZoom:Number;
 		
 		public var zoomTolerance:Number = 4;
@@ -61,6 +63,7 @@ package com.modestmaps.overlays
 		public function PolygonMarker(map:Map, locations:Array, autoClose:Boolean=true)
 		{
 			this.map = map;
+			this.provider = map.getMapProvider();
 			this.mouseEnabled = false;
 			this.autoClose = autoClose;
 
@@ -80,7 +83,7 @@ package com.modestmaps.overlays
 					for each (var hole:Array in locations.slice(1))
 					{
 						addHole(hole);
-					}					
+					}
 				}
 			}
 		}
@@ -95,12 +98,12 @@ package com.modestmaps.overlays
 		
 		protected function l2c(l:Location, ...rest):Coordinate
 		{
-			return map.getMapProvider().locationCoordinate(l);
+			return provider.locationCoordinate(l);
 		}
 	
 		public function redraw(event:Event=null):void
 		{	
-			if (drawZoom && Math.abs(map.grid.zoomLevel-drawZoom) < zoomTolerance) {
+			if (event && drawZoom && Math.abs(map.grid.zoomLevel-drawZoom) < zoomTolerance) {
 				scaleX = scaleY = Math.pow(2, map.grid.zoomLevel-drawZoom);
 			}
 			else {
@@ -108,7 +111,7 @@ package com.modestmaps.overlays
 			}
 		}
 		
-		protected function updateGraphics():void
+		public function updateGraphics():void
 		{	
 			var grid:TileGrid = map.grid;
 			

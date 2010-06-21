@@ -14,10 +14,10 @@ package com.modestmaps.extras
     {
         public var map:Map;
         
-        private var panStart:Point;
+        protected var panStart:Point;
 
-        private var polySprite:Sprite = new Sprite();
-        private var polyCont:Sprite = new Sprite();
+        protected var polySprite:Sprite = new Sprite();
+        protected var polyCont:Sprite = new Sprite();
 
         public function Overlay(map:Map)
         {

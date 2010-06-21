@@ -1,28 +1,20 @@
 package com.modestmaps.core 
 {
+	import com.modestmaps.core.painter.ITilePainter;
+	import com.modestmaps.core.painter.ITilePainterOverride;
+	import com.modestmaps.core.painter.TilePainter;
 	import com.modestmaps.events.MapEvent;
 	import com.modestmaps.mapproviders.IMapProvider;
 	
-	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
-	import flash.display.Loader;
-	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	import flash.events.Event;
-	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.events.ProgressEvent;
-	import flash.events.TimerEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	import flash.net.URLRequest;
-	import flash.system.LoaderContext;
-	import flash.system.System;
 	import flash.text.TextField;
-	import flash.text.TextFormat;
-	import flash.utils.Dictionary;
-	import flash.utils.Timer;
 	import flash.utils.getTimer;
 
 	public class TileGrid extends Sprite
@@ -38,12 +30,8 @@ package com.modestmaps.core
 		protected static const DEFAULT_MAX_TILES_TO_KEEP:int = 256; // 256*256*4bytes = 0.25MB ... so 256 tiles is 64MB of memory, minimum!
 		protected static const DEFAULT_TILE_BUFFER:int = 0;
 		protected static const DEFAULT_ENFORCE_BOUNDS:Boolean = true;
-		protected static const DEFAULT_MAX_OPEN_REQUESTS:int = 4; // TODO: should this be split into max-new-requests-per-frame, too?
 		protected static const DEFAULT_ROUND_POSITIONS:Boolean = true;
 		protected static const DEFAULT_ROUND_SCALES:Boolean = true;
-		protected static const DEFAULT_CACHE_LOADERS:Boolean = false;  // !!! only enable this if you have crossdomain permissions to access Loader content
-		protected static const DEFAULT_SMOOTH_CONTENT:Boolean = false; // !!! only enable this if you have crossdomain permissions to access Loader content
-		protected static const DEFAULT_MAX_LOADER_CACHE_SIZE:int = 0; // !!! suggest 256 or so
 
 		/** if we don't have a tile at currentZoom, onRender will look for tiles up to 5 levels out.
 		 *  set this to 0 if you only want the current zoom level's tiles
@@ -65,9 +53,6 @@ package com.modestmaps.core
 		// 0 or 1, really: 2 will load *lots* of extra tiles
 		public var tileBuffer:int = DEFAULT_TILE_BUFFER;
 		
-		// how many Loaders are allowed to be open at once?
-		public var maxOpenRequests:int = DEFAULT_MAX_OPEN_REQUESTS;
-
 		/** set this to true to enable enforcing of map bounds from the map provider's limits */
 		public var enforceBoundsEnabled:Boolean = DEFAULT_ENFORCE_BOUNDS;
 		
@@ -77,16 +62,6 @@ package com.modestmaps.core
 		/** set this to false, along with roundPositionsEnabled, if you need a map to stay 'fixed' in place as it changes size */
 		public var roundScalesEnabled:Boolean = DEFAULT_ROUND_SCALES;
 
-		/** set this to true to enable bitmap smoothing on tiles - requires crossdomain.xml permissions so won't work online with most providers */
-		public var smoothContent:Boolean = DEFAULT_SMOOTH_CONTENT;
-		
-		/** with tile providers that you have crossdomain.xml support for, 
-		 *  it's possible to avoid extra requests by reusing bitmapdata. enable cacheLoaders to try and do that */
-		public static var cacheLoaders:Boolean = DEFAULT_CACHE_LOADERS;
-		public static var maxLoaderCacheSize:int = DEFAULT_MAX_LOADER_CACHE_SIZE;
-		protected static var loaderCache:Object = {};
-		protected static var cachedUrls:Array = [];
-		
 		///////////////////////////////
 		// END OPTIONS
 
@@ -119,33 +94,21 @@ package com.modestmaps.core
 		// (these also have lazy getters)
 		protected var _topLeftCoordinate:Coordinate;
 		protected var _bottomRightCoordinate:Coordinate;
+		protected var _topRightCoordinate:Coordinate;
+		protected var _bottomLeftCoordinate:Coordinate;
 		protected var _centerCoordinate:Coordinate;
 
 		// where the tiles live:
 		protected var well:Sprite;
 
-		protected var provider:IMapProvider;
+		//protected var provider:IMapProvider;
+		protected var tilePainter:ITilePainter;
 
-		protected var tileQueue:TileQueue;
-
-		protected var tileCache:TileCache;
-
-		protected var tilePool:TilePool;
+		// coordinate bounds derived from IMapProviders
+		protected var limits:Array;
 		
-		// per-tile, the array of images we're going to load, which can be empty
-		// TODO: document this in IMapProvider, so that provider implementers know
-		// they are free to check the bounds of their overlays and don't have to serve
-		// millions of 404s
-		protected var layersNeeded:Object = {};
-
 		// keys we've recently seen
 		protected var recentlySeen:Array = [];
-		
-		// open requests
-		protected var openRequests:Array = [];
-
-		// keeping track for dispatching MapEvent.ALL_TILES_LOADED and MapEvent.BEGIN_TILE_LOADING
-		protected var previousOpenRequests:int = 0;
 		
 		// currently visible tiles
 		protected var visibleTiles:Array = [];
@@ -154,12 +117,8 @@ package com.modestmaps.core
 		protected var blankCount:int = 0;
 
 		// a textfield with lots of stats
-		public var debugField:TextField;
+		public var debugField:DebugField;
 		
-		// for stats:
-		protected var lastFrameTime:Number;
-		protected var fps:Number = 30;
-
 		// what zoom level of tiles is 'correct'?
 		protected var _currentTileZoom:int; 
 		// so we know if we're going in or out
@@ -191,8 +150,6 @@ package com.modestmaps.core
 		// setting to true will dispatch a CHANGE event which Map will convert to an EXTENT_CHANGED for us
 		protected var matrixChanged:Boolean = false;
 		
-		protected var queueTimer:Timer;
-		
 		public function TileGrid(w:Number, h:Number, draggable:Boolean, provider:IMapProvider)
 		{
 			doubleClickEnabled = true;
@@ -201,7 +158,19 @@ package com.modestmaps.core
 			this.draggable = draggable;
 
 			// don't call set map provider here, because it triggers a redraw and we're not ready for that
-			this.provider = provider;
+			//this.provider = provider;
+			
+			if (provider is ITilePainterOverride) {
+				this.tilePainter = ITilePainterOverride(provider).getTilePainter();
+			}
+			else {
+				this.tilePainter = new TilePainter(this, provider, maxParentLoad == 0 ? centerDistanceCompare : zoomThenCenterCompare);
+			}
+			tilePainter.addEventListener(ProgressEvent.PROGRESS, onProgress, false, 0, true);
+			tilePainter.addEventListener(MapEvent.ALL_TILES_LOADED, onAllTilesLoaded, false, 0, true);
+			tilePainter.addEventListener(MapEvent.BEGIN_TILE_LOADING, onBeginTileLoading, false, 0, true);
+			
+			this.limits = provider.outerLimits();
 			
 			// but do grab tile dimensions:
 			_tileWidth = provider.tileWidth;
@@ -210,27 +179,13 @@ package com.modestmaps.core
 			// and calculate bounds from provider
 			calculateBounds();
 			
-			this.tilePool = new TilePool(Tile);
-			this.tileQueue = new TileQueue();
-			this.tileCache = new TileCache(tilePool);
-
 			this.mapWidth = w;
 			this.mapHeight = h;
+			scrollRect = new Rectangle(0, 0, mapWidth, mapHeight);
 
-			debugField = new TextField();
-			debugField.defaultTextFormat = new TextFormat(null, 12, 0x000000, false);
-			debugField.backgroundColor = 0xffffff;
-			debugField.background = true;
-			debugField.text = "messages";
+			debugField = new DebugField();
 			debugField.x = mapWidth - debugField.width - 15; 
 			debugField.y = mapHeight - debugField.height - 15;
- 			debugField.name = 'text';
- 			debugField.mouseEnabled = false;
- 			debugField.selectable = false;
- 			debugField.multiline = true;
- 			debugField.wordWrap = false;
-			
-			lastFrameTime = getTimer();
 			
 			well = new Sprite();
 			well.name = 'well';
@@ -241,10 +196,7 @@ package com.modestmaps.core
 
 			worldMatrix = new Matrix();
 			
-			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
-			
-			queueTimer = new Timer(200);
-			queueTimer.addEventListener(TimerEvent.TIMER, processQueue);
+			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);			
 		}
 		
 		/**
@@ -264,7 +216,6 @@ package com.modestmaps.core
 			}
 			addEventListener(Event.RENDER, onRender);
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
-			queueTimer.start();
 			addEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
 			removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 			dirty = true;
@@ -279,7 +230,8 @@ package com.modestmaps.core
 			}
 			removeEventListener(Event.RENDER, onRender);
 			removeEventListener(Event.ENTER_FRAME, onEnterFrame);
-			queueTimer.stop();
+			// FIXME: should we still do this, in TilePainter?
+			//queueTimer.stop();
 			removeEventListener(Event.REMOVED_FROM_STAGE, onRemovedFromStage);
 			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		}
@@ -292,50 +244,20 @@ package com.modestmaps.core
 		 */ 
 		public function setTileClass(tileClass:Class):void
 		{
-			tilePool.setTileClass(tileClass);
+			// first get rid of everything, which passes tiles back to the pool
 			clearEverything();
+			// then assign the new class, which creates a new pool array
+			tilePainter.setTileClass(tileClass);
 		}
 		
 		/** processes the tileQueue and optionally outputs stats into debugField */
 		protected function onEnterFrame(event:Event=null):void
 		{
 			if (debugField.parent) {
-				// for stats...
-				var frameDuration:Number = getTimer() - lastFrameTime;
-				lastFrameTime = getTimer();
-				
-				fps = (0.9 * fps) + (0.1 * (1000.0/frameDuration));
-	
-	 			// report stats:
- 				var tileChildren:int = 0;
-				for (var i:int = 0; i < well.numChildren; i++) {
-					tileChildren += Tile(well.getChildAt(i)).numChildren;
-				}  
-/* 				debugField.text = "fps: " + fps.toFixed(0)
-						+ "\nmemory: " + (System.totalMemory/1048576).toFixed(1) + "MB"; */
- 
-				debugField.text = "tx: " + tx.toFixed(3)
-						+ "\nty: " + tx.toFixed(3)
-						+ "\nsc: " + scale.toFixed(4)
-						+ "\nfps: " + fps.toFixed(0)
-						+ "\ncurrent child count: " + well.numChildren
-						+ "\ncurrent child of tile count: " + tileChildren
-						+ "\nvisible tile count: " + visibleTiles.length
-						+ "\nqueue length: " + tileQueue.length
-						+ "\nblank count: " + blankCount
-						+ "\nrequests: " + openRequests.length
-						+ "\nfinished (cached) tiles: " + tileCache.size
-						+ "\nrecently used tiles: " + recentlySeen.length
-						+ "\ncachedLoaders: " + cachedUrls.length
-						+ "\nTiles created: " + Tile.count
-						+ "\nmemory: " + (System.totalMemory/1048576).toFixed(1) + "MB"; 
-				debugField.width = debugField.textWidth+8;
-				debugField.height = debugField.textHeight+4;
+				debugField.update(this, blankCount, recentlySeen.length, tilePainter);
 				debugField.x = mapWidth - debugField.width - 15; 
 				debugField.y = mapHeight - debugField.height - 15;
 			}
-			
-			//processQueue();
 		}
 		
 		protected function onRendered():void
@@ -365,20 +287,22 @@ package com.modestmaps.core
 			dispatchEvent(new Event(Event.CHANGE, false, false));			
 		}
 		
-		protected function onBeginTileLoading():void
+		protected function onBeginTileLoading(event:MapEvent):void
 		{
-			dispatchEvent(new MapEvent(MapEvent.BEGIN_TILE_LOADING));			
+			dispatchEvent(event);			
 		}
 		
-		protected function onProgress():void
+		protected function onProgress(event:ProgressEvent):void
 		{
 		    // dispatch tile load progress
-		    dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, previousOpenRequests - openRequests.length, previousOpenRequests));			
+			dispatchEvent(event);			
 		}
 		
-		protected function onAllTilesLoaded():void
+		protected function onAllTilesLoaded(event:MapEvent):void
 		{
-			dispatchEvent(new MapEvent(MapEvent.ALL_TILES_LOADED));			
+			dispatchEvent(event);
+			// request redraw to take parent and child tiles off the stage if we haven't already
+			dirty = true;			
 		}
 		
 		/** 
@@ -390,13 +314,16 @@ package com.modestmaps.core
 		 */
 		protected function onRender(event:Event=null):void
 		{
+			var t:Number = getTimer();
+			
 			if (!dirty || !stage) {
+				//trace(getTimer() - t, "ms in", provider);		
 				onRendered();
 				return;
 			}
 
 			var boundsEnforced:Boolean = enforceBounds();
-
+			
 			if (zooming || panning) {
 				if (panning) {
 					onPanned();
@@ -427,26 +354,29 @@ package com.modestmaps.core
 			_currentTileZoom = newZoom;
 		
 			// find start and end columns for the visible tiles, at current tile zoom
-			// TODO: take account of potential rotation in worldMatrix (ask Tom about this if you need it)
+			// we project all four corners to take account of potential rotation in worldMatrix
 			var tlC:Coordinate = topLeftCoordinate.zoomTo(currentTileZoom);
 			var brC:Coordinate = bottomRightCoordinate.zoomTo(currentTileZoom);
+			var trC:Coordinate = topRightCoordinate.zoomTo(currentTileZoom);
+			var blC:Coordinate = bottomLeftCoordinate.zoomTo(currentTileZoom);
 			
 			// optionally pad it out a little bit more with a tile buffer
 			// TODO: investigate giving a directional bias to TILE_BUFFER when panning quickly
 			// NB:- I'm pretty sure these calculations are accurate enough that using 
 			//      Math.ceil for the maxCols will load one column too many -- Tom
-			var minCol:int = Math.floor(tlC.column) - tileBuffer;
-			var maxCol:int = Math.floor(brC.column) + tileBuffer;
-			var minRow:int = Math.floor(tlC.row) - tileBuffer;
-			var maxRow:int = Math.floor(brC.row) + tileBuffer;
+			var minCol:int = Math.floor(Math.min(tlC.column,brC.column,trC.column,blC.column)) - tileBuffer;
+			var maxCol:int = Math.floor(Math.max(tlC.column,brC.column,trC.column,blC.column)) + tileBuffer;
+			var minRow:int = Math.floor(Math.min(tlC.row,brC.row,trC.row,blC.row)) - tileBuffer;
+			var maxRow:int = Math.floor(Math.max(tlC.row,brC.row,trC.row,blC.row)) + tileBuffer;
 
-			// loop over all tiles and find parent or child tiles from cache to compensate for unloaded tiles:			
+			// loop over all tiles and find parent or child tiles from cache to compensate for unloaded tiles:
+			
 			repopulateVisibleTiles(minCol, maxCol, minRow, maxRow);
-
+			
 			// move visible tiles to the end of recentlySeen if we're done loading them
 			// the 'least recently seen' tiles will be removed from the tileCache below
 			for each (var visibleTile:Tile in visibleTiles) {
-				if (!layersNeeded[visibleTile.name]) {
+				if (tilePainter.isPainted(visibleTile)) {
 					var ri:int = recentlySeen.indexOf(visibleTile.name); 
 					if (ri >= 0) {
 						recentlySeen.splice(ri, 1);
@@ -463,14 +393,7 @@ package com.modestmaps.core
 				if (visibleTiles.indexOf(wellTile) < 0) {
 					well.removeChild(wellTile);
 					wellTile.hide();
-					if (!tileCache.containsKey(wellTile.name)) {
-						//trace("destroying tile that was in the well but never cached");
-						delete layersNeeded[wellTile.name];
-						if (tileQueue.contains(wellTile)) {
-							tileQueue.remove(wellTile);
-						}
-						tilePool.returnTile(wellTile);
-					}
+					tilePainter.cancelPainting(wellTile);
 				}
 			}
 
@@ -498,7 +421,7 @@ package com.modestmaps.core
 				
 				// loop over our internal tile cache 
 				// and throw out tiles not in recentlySeen
-				tileCache.retainKeys(recentlySeen); 
+				tilePainter.retainKeysInCache(recentlySeen);
 			}
 			
 			// update centerRow and centerCol for sorting the tileQueue in processQueue()
@@ -509,6 +432,8 @@ package com.modestmaps.core
 			onRendered();
 
 			dirty = false;
+						
+			//trace(getTimer() - t, "ms in", provider);			
 		}
 				
 		/**
@@ -538,22 +463,12 @@ package com.modestmaps.core
 										
 					// create it if not, and add it to the load queue
 					if (!tile) {
-						tile = tileCache.getTile(key);
+						tile = tilePainter.getTileFromCache(key);
 						if (!tile) {
-							tile = tilePool.getTile(col, row, currentTileZoom);
-							tile.name = key;
- 							coord.row = tile.row;
-							coord.column = tile.column;
-							coord.zoom = tile.zoom; 
-							var urls:Array = provider.getTileUrls(coord);
-							if (urls && urls.length > 0) {
-								// keep a local copy of the URLs so we don't have to call this twice:
-								layersNeeded[tile.name] = urls;
-								tileQueue.push(tile);
-							}
-							else {
-								tile.show();
-							}
+ 							coord.row = row;
+							coord.column = col;
+							coord.zoom = currentTileZoom;
+							tile = tilePainter.createAndPopulateTile(coord, key); 
 						}
 						else {
 							tile.show();
@@ -563,7 +478,7 @@ package com.modestmaps.core
 					
  					visibleTiles.push(tile);
 					
-					var tileReady:Boolean = tile.isShowing() && (layersNeeded[tile.name] == null);
+					var tileReady:Boolean = tile.isShowing() && !tilePainter.isPainting(tile);
 					
 					//
 					// if the tile isn't ready yet, we're going to reuse a parent tile
@@ -667,20 +582,32 @@ package com.modestmaps.core
 			
 		} // repopulateVisibleTiles
 		
+		// TODO: do this with events instead?
+		public function tilePainted(tile:Tile):void
+		{			
+			if (currentTileZoom-tile.zoom <= maxParentLoad) {
+				tile.show();
+			}
+			else {
+				tile.showNow();
+			}
+		}
+		
+		/** 
+		 * returns an array of all the tiles that are on the screen
+		 * (including parent and child tiles currently visible until
+		 * the current zoom level finishes loading)
+		 * */
+		public function getVisibleTiles():Array
+		{
+			return visibleTiles;
+		}
+		
 		private function positionTiles(realMinCol:Number, realMinRow:Number):void
 		{
  			// sort children by difference from current zoom level
  			// this means current is on top, +1 and -1 are next, then +2 and -2, etc.
 			visibleTiles.sort(distanceFromCurrentZoomCompare, Array.DESCENDING);
-			
-/* 			var zooms:Array = visibleTiles.map(function(tile:Tile, ...rest):int {
-				return tile.zoom;
-			});
-			trace("currentTileZoom", currentTileZoom);
-			trace("tile zooms:", zooms); */
-
-			// for fixing positions when we're between zoom levels:
- 			var positionScaleCompensation:Number = Math.pow(2, zoomLevel-currentTileZoom);
 			
  			// for positioning tile according to current transform, based on current tile zoom
  			var scaleFactors:Array = new Array(maxZoom+1);
@@ -688,7 +615,6 @@ package com.modestmaps.core
  			var tileScales:Array = new Array(maxZoom+1);
 			for (var z:int = 0; z <= maxZoom; z++) {
 				scaleFactors[z] = Math.pow(2.0, currentTileZoom-z)
-				
 				// round up to the nearest pixel to avoid seams between zoom levels
 				if (roundScalesEnabled) {
 					tileScales[z] = Math.ceil(Math.pow(2, zoomLevel-z) * tileWidth) / tileWidth; 
@@ -698,8 +624,9 @@ package com.modestmaps.core
 				}
 			}
 			
-			//trace();
-			//trace("tile.zoom, tile.alpha, tile.numChildren ? tile.getChildAt(0).alpha : '', tile.isShowing() && (layersNeeded[tile.name] == null), tileCache.containsKey(tile.name)");
+			// hugs http://www.senocular.com/flash/tutorials/transformmatrix/
+			var px:Point = worldMatrix.deltaTransformPoint(new Point(0, 1));
+			var tileAngleDegrees:Number = ((180/Math.PI) * Math.atan2(px.y, px.x) - 90);
 			
  			// apply the sorted depths, position all the tiles and also keep recentlySeen updated:
 			for each (var tile:Tile in visibleTiles) {
@@ -707,128 +634,16 @@ package com.modestmaps.core
 				// if we set them all to numChildren-1, descending, they should end up correctly sorted
 				well.setChildIndex(tile, well.numChildren-1);
 
- 				var positionCol:Number = (scaleFactors[tile.zoom]*tile.column) - realMinCol;
- 				var positionRow:Number = (scaleFactors[tile.zoom]*tile.row) - realMinRow;
-
 				tile.scaleX = tile.scaleY = tileScales[tile.zoom];
 
-  				if (!zooming && roundPositionsEnabled) {
-	 				// this also helps the rare seams not fixed by rounding the tile scale, 
- 					// but makes slow zooming uglier: 
- 					// round, not floor, because the latter causes artifacts at lower zoom levels :(
-					tile.x = Math.round(positionCol*tileWidth*positionScaleCompensation);
-					tile.y = Math.round(positionRow*tileHeight*positionScaleCompensation);
-				}
-				else {
-					tile.x = positionCol*tileWidth*positionScaleCompensation;
-					tile.y = positionRow*tileHeight*positionScaleCompensation;
-				}
+				var pt:Point = coordinatePoint(new Coordinate(tile.row, tile.column, tile.zoom));
+				tile.x = pt.x;
+				tile.y = pt.y;
 				
+				tile.rotation = tileAngleDegrees;				
 			}
 		}
 		
-		/** called by the onEnterFrame handler to manage the tileQueue
-		 *  usual operation is extremely quick, ~1ms or so */
-		private function processQueue(event:TimerEvent=null):void
-		{
-			if (openRequests.length < maxOpenRequests && tileQueue.length > 0) {
-
-				// prune queue for tiles that aren't visible
-				var removedTiles:Array = tileQueue.retainAll(visibleTiles);
-				
-				// keep layersNeeded tidy:
-				for each (var removedTile:Tile in removedTiles) {
-					delete layersNeeded[removedTile.name];
-				}
-				
-				// note that queue is not the same as visible tiles, because things 
-				// that have already been loaded are also in visible tiles. if we
-				// reuse visible tiles for the queue we'll be loading the same things over and over
-	
-				if (maxParentLoad == 0) {
-					// sort queue by distance from 'center'
-					tileQueue.sortTiles(centerDistanceCompare);
-				}
-				else {
-					tileQueue.sortTiles(zoomThenCenterCompare);					
-				}
-								
-				// process the queue
-				while (openRequests.length < maxOpenRequests && tileQueue.length > 0) {
-					var tile:Tile = tileQueue.shift();
-					// if it's still on the stage:
-					if (tile.parent) {
-						loadNextURLForTile(tile);
-					}
-				}
-			}
-
-			// you might want to wait for tiles to load before displaying other data, interface elements, etc.
-			// these events take care of that for you...
-			if (previousOpenRequests == 0 && openRequests.length > 0) {
-				onBeginTileLoading();
-			}
-			else if (previousOpenRequests > 0)
-			{
-				// TODO: a custom event for load progress rather than overloading bytesloaded?
-				onProgress();
-
-			    // if we're finished...
-			    if (openRequests.length == 0)
-			    {
-			    	onAllTilesLoaded();
-    				// request redraw to take parent and child tiles off the stage if we haven't already
-    				dirty = true;
-    			}
-			}
-			
-			previousOpenRequests = openRequests.length;
-		}
-
-		private function loadNextURLForTile(tile:Tile):void
-		{
-			// TODO: add urls to Tile?
-			var urls:Array = layersNeeded[tile.name] as Array;
-			if (urls && urls.length > 0) {
-				var url:* = urls.shift();
-				if (cacheLoaders && (url is String) && loaderCache[url]) {
-					var original:Bitmap = loaderCache[url] as Bitmap;
-					var bitmap:Bitmap = new Bitmap(original.bitmapData); 
-					tile.addChild(bitmap);
-					loadNextURLForTile(tile);
-				}
-				else {
-					var tileLoader:Loader = new Loader();
-					tileLoader.name = tile.name;
-					try {
-						if (cacheLoaders || smoothContent) {
-							// check crossdomain permissions on tiles if we plan to access their bitmap content
-							tileLoader.load((url is URLRequest) ? url : new URLRequest(url), new LoaderContext(true));
-						}
-						else {
-							tileLoader.load((url is URLRequest) ? url : new URLRequest(url));
-						}
-						tileLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadEnd, false, 0, true);
-						tileLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onLoadError, false, 0, true);
-						openRequests.push(tileLoader);
-					}
-					catch(error:Error) {
-						tile.paintError();
-					}
-				}
-			}
-			else if (urls && urls.length == 0) {
-				if (currentTileZoom-tile.zoom <= maxParentLoad) {
-					tile.show();
-				}
-				else {
-					tile.showNow();
-				}
-				tileCache.putTile(tile);					
-				delete layersNeeded[tile.name];
-			}			
-		}
-
 		private function zoomThenCenterCompare(t1:Tile, t2:Tile):int
 		{
 			if (t1.zoom == t2.zoom) {
@@ -862,21 +677,16 @@ package com.modestmaps.core
 			return t1.zoom == t2.zoom ? 0 : t1.zoom > t2.zoom ? 1 : -1; 
 		}
 
-		// makes sure that if a tile with the given key exists in the cache that it is added to the well and added to visibleTiles
+		// makes sure that if a tile with the given key exists in the cache
+		// that it is added to the well and added to visibleTiles
 		// returns null if tile does not exist in cache
 		private function ensureVisible(key:String):Tile
 		{
-			if (tileCache.containsKey(key)) {
-				var tile:Tile = well.getChildByName(key) as Tile;
-				if (!tile) {
-					tile = tileCache.getTile(key);
+			var tile:Tile = tilePainter.getTileFromCache(key);
+			if (tile) {
+				if (!well.contains(tile)) {
 					well.addChildAt(tile,0);
-					if (currentTileZoom-tile.zoom <= maxParentLoad) {
-						tile.show();
-					}
-					else {
-						tile.showNow();						
-					}
+					tilePainted(tile);
 				}
 				if (visibleTiles.indexOf(tile) < 0) {
 					visibleTiles.push(tile); // don't get rid of it yet!
@@ -892,25 +702,13 @@ package com.modestmaps.core
 		/** create a tile and add it to the queue - WARNING: this is buggy for the current zoom level, it's only used for parent zooms when maxParentLoad is > 0 */ 
 		private function requestLoad(col:int, row:int, zoom:int):Tile
 		{
-			var key:String = tileKey(col, row, zoom);
-			if (tileCache.containsKey(key)) throw new Error("requested load for an already cached tile");			
+			var key:String = tileKey(col, row, zoom);			
 			var tile:Tile = well.getChildByName(key) as Tile; 
 			if (!tile) {
-				tile = tilePool.getTile(col, row, zoom);
-				tile.name = key;
 				tempCoord.row = row;
 				tempCoord.column = col;
 				tempCoord.zoom = zoom;
-				var urls:Array = provider.getTileUrls(tempCoord);
-				if (urls && urls.length > 0) {
-					// keep a local copy of the URLs so we don't have to call this twice:
-					layersNeeded[tile.name] = urls;
-					tileQueue.push(tile);
-				}
-				else {
-					// trace("no urls needed for that tile", tempCoord);
-					tile.show();
-				}
+				tile = tilePainter.createAndPopulateTile(tempCoord, key);
 				well.addChild(tile);
 			}
 			return tile;
@@ -957,75 +755,6 @@ package com.modestmaps.core
  			return keys;
 		}
 						
-		private function onLoadEnd(event:Event):void
-		{
-			var loader:Loader = (event.target as LoaderInfo).loader;
-			
-			if (cacheLoaders && !loaderCache[loader.contentLoaderInfo.url]) {
-				//trace('caching content for', loader.contentLoaderInfo.url);
-				try {
-					var content:Bitmap = loader.content as Bitmap;
-					loaderCache[loader.contentLoaderInfo.url] = content;
-					cachedUrls.push(loader.contentLoaderInfo.url);
-					if (cachedUrls.length > maxLoaderCacheSize) {
-						delete loaderCache[cachedUrls.shift()];
-					}
-				}
-				catch (error:Error) {
-					// ???
-				}
-			}
-			
-			if (smoothContent) {
-				try {
-					var smoothContent:Bitmap = loader.content as Bitmap;
-					smoothContent.smoothing = true;
-				}
-				catch (error:Error) {
-					// ???
-				}
-			}			
-
-			// tidy up the request monitor
-			var index:int = openRequests.indexOf(loader);
-			if (index >= 0) {
-				openRequests.splice(index,1);
-			}
-			
-			var tile:Tile = well.getChildByName(loader.name) as Tile;
-			if (tile) { 
-				tile.addChild(loader);
-				loadNextURLForTile(tile);
-			}
-			else {
-				// we've loaded an image, but its parent tile has been removed
-				// so we'll have to throw it away
-			}
-		}
-
-		private function onLoadError(event:IOErrorEvent):void
-		{
-			var loaderInfo:LoaderInfo = event.target as LoaderInfo;
-			for (var i:int = openRequests.length-1; i >= 0; i--) {
-				var loader:Loader = openRequests[i] as Loader;
-				if (loader.contentLoaderInfo == loaderInfo) {
-					openRequests.splice(i,1);
-					var tile:Tile = well.getChildByName(loader.name) as Tile;
-					if (tile) {
-						delete layersNeeded[tile.name];
-						tile.paintError(tileWidth, tileHeight);
-						if (currentTileZoom-tile.zoom <= maxParentLoad) {
-							tile.show();
-						}
-						else {
-							tile.showNow();
-						}
-					}
-					break;
-				}
-			}
-		}	
-		
 		public function mousePressed(event:MouseEvent):void
 		{
 			prepareForPanning(true);
@@ -1119,6 +848,24 @@ package com.modestmaps.core
 			}
 			return _bottomRightCoordinate;
 		}
+
+		public function get topRightCoordinate():Coordinate
+		{
+			if (!_topRightCoordinate) {
+				var tr:Point = invertedMatrix.transformPoint(new Point(mapWidth,0));
+				_topRightCoordinate = new Coordinate(tr.y, tr.x, zoomLevel);			
+			}
+			return _topRightCoordinate;
+		}
+
+		public function get bottomLeftCoordinate():Coordinate
+		{
+			if (!_bottomLeftCoordinate) {
+				var bl:Point = invertedMatrix.transformPoint(new Point(0, mapHeight));
+				_bottomLeftCoordinate = new Coordinate(bl.y, bl.x, zoomLevel);			
+			}
+			return _bottomLeftCoordinate;
+		}
 						
 		public function get centerCoordinate():Coordinate
 		{
@@ -1131,21 +878,12 @@ package com.modestmaps.core
 		
 		public function coordinatePoint(coord:Coordinate, context:DisplayObject=null):Point
 		{
-			// this is the same as coord.zoomTo, but doesn't make a new Coordinate:
-			var zoomFactor:Number = Math.pow(2, zoomLevel - coord.zoom);
-			//zoomFactor *= tileWidth/scale;
+			// this is basically the same as coord.zoomTo, but doesn't make a new Coordinate:
+			var zoomFactor:Number = Math.pow(2, 8-coord.zoom);
 			var zoomedColumn:Number = coord.column * zoomFactor;
 			var zoomedRow:Number = coord.row * zoomFactor;
-			
- 			var tl:Coordinate = topLeftCoordinate;
-			var br:Coordinate = bottomRightCoordinate;
-			
-			var cols:Number = br.column - tl.column;
-			var rows:Number = br.row - tl.row;
-			
-			var screenPoint:Point = new Point(mapWidth * (zoomedColumn-tl.column) / cols, mapHeight * (zoomedRow-tl.row) / rows); 
-			
-			//var screenPoint:Point = worldMatrix.transformPoint(new Point(zoomedColumn, zoomedRow));
+						
+			var screenPoint:Point = worldMatrix.transformPoint(new Point(zoomedColumn, zoomedRow));
 
 			if (context && context != this)
             {
@@ -1155,6 +893,7 @@ package com.modestmaps.core
 
 			return screenPoint; 
 		}
+		
 		public function pointCoordinate(point:Point, context:DisplayObject=null):Coordinate
 		{			
 			if (context && context != this)
@@ -1321,7 +1060,19 @@ package com.modestmaps.core
 		
 		public function setMapProvider(provider:IMapProvider):void
 		{
-			this.provider = provider;
+			if (provider is ITilePainterOverride) {
+				this.tilePainter = ITilePainterOverride(provider).getTilePainter();
+			}
+			else {
+				this.tilePainter = new TilePainter(this, provider, maxParentLoad == 0 ? centerDistanceCompare : zoomThenCenterCompare);
+			}
+			
+			tilePainter.addEventListener(ProgressEvent.PROGRESS, onProgress, false, 0, true);
+			tilePainter.addEventListener(MapEvent.ALL_TILES_LOADED, onAllTilesLoaded, false, 0, true);
+			tilePainter.addEventListener(MapEvent.BEGIN_TILE_LOADING, onBeginTileLoading, false, 0, true);
+
+			// TODO: set limits independently of provider
+			this.limits = provider.outerLimits();
 
 			_tileWidth = provider.tileWidth;
 			_tileHeight = provider.tileHeight;
@@ -1331,45 +1082,21 @@ package com.modestmaps.core
 			clearEverything();
 		}
 		
-		protected function clearEverything():void
+		protected function clearEverything(event:Event=null):void
 		{
 			while (well.numChildren > 0) {			
-				var tile:Tile = well.removeChildAt(0) as Tile;
-				if (!tileCache.containsKey(tile.name)) {
-					delete layersNeeded[tile.name];
-					tilePool.returnTile(tile);
-				}
+				well.removeChildAt(0);
 			}
-			
-			for each (var loader:Loader in openRequests) {
-				try {
-					// la la I can't hear you
-					loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadEnd);
-					loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onLoadError);
-					loader.close();
-				}
-				catch (error:Error) {
-					// close often doesn't work, no biggie
-				}
-			}
-			openRequests = [];
-			
-			for (var key:String in layersNeeded) {
-				delete layersNeeded[key];
-			}
-			layersNeeded = {}; 
 
+			tilePainter.reset();
+						
 			recentlySeen = [];
-			
-			tileQueue.clear();			
-			tileCache.clear();
-			
+						
 			dirty = true;
 		}
 
 		protected function calculateBounds():void
 		{
-			var limits:Array = provider.outerLimits();			
 			var tl:Coordinate = limits[0] as Coordinate;
 			var br:Coordinate = limits[1] as Coordinate;
 
@@ -1385,23 +1112,93 @@ package com.modestmaps.core
 			maxTy = br.row * tileHeight;
 		}
 		
+		/** this may seem like a heavy function, but it only gets called once per render 
+		 *  and it doesn't have any loops, so it flies by, really 
+		 *  TODO: fix this for rotations */
+		public function enforceBoundsOnMatrix(matrix:Matrix):Boolean
+		{
+			var touched:Boolean = false;
+
+			// first check that we're not zoomed in too close...
+			
+			var matrixScale:Number = Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b);
+			var matrixZoomLevel:Number = Math.log(matrixScale) / Math.LN2;			
+
+ 			if (matrixZoomLevel < minZoom || matrixZoomLevel > maxZoom) {
+ 				var oldScale:Number = matrixScale; 
+ 				matrixZoomLevel = Math.max(minZoom, Math.min(matrixZoomLevel, maxZoom));
+				matrixScale = Math.pow(2, matrixZoomLevel);
+				var scaleFactor:Number = matrixScale / oldScale;
+				matrix.scale(scaleFactor, scaleFactor);
+				touched = true;
+			}
+
+			// then make sure we haven't gone too far...
+			
+			var inverse:Matrix = matrix.clone();
+			inverse.invert();
+			inverse.scale(matrixScale/tileWidth, matrixScale/tileHeight);
+			
+			// zoom topLeft and bottomRight coords to 0
+			// so that they can be compared against minTx etc.
+			
+			var topLeftPoint:Point = inverse.transformPoint(new Point());
+			var topLeft:Coordinate = new Coordinate(topLeftPoint.y, topLeftPoint.x, matrixZoomLevel).zoomTo(0);
+
+			var bottomRightPoint:Point = inverse.transformPoint(new Point(mapWidth, mapHeight));
+			var bottomRight:Coordinate = new Coordinate(bottomRightPoint.y, bottomRightPoint.x, matrixZoomLevel).zoomTo(0);
+			
+			// apply horizontal constraints
+			
+			var leftX:Number = topLeft.column * tileWidth;
+			var rightX:Number = bottomRight.column * tileWidth;
+			
+   			if (rightX-leftX > maxTx-minTx) {
+				// if we're wider than the map, center align 
+ 				matrix.tx = (mapWidth-(minTx+maxTx)*matrixScale)/2;
+				touched = true;
+ 			}
+ 			else if (leftX < minTx) {
+ 				matrix.tx += (leftX-minTx)*matrixScale;
+				touched = true;
+			}
+ 			else if (rightX > maxTx) {
+ 				matrix.tx += (rightX-maxTx)*matrixScale;
+				touched = true;
+			}
+
+			// apply vertical constraints
+
+ 			var upY:Number = topLeft.row * tileHeight;
+			var downY:Number = bottomRight.row * tileHeight;
+
+   			if (downY-upY > maxTy-minTy) {
+				// if we're taller than the map, center align    				
+ 				matrix.ty = (mapHeight-(minTy+maxTy)*matrixScale)/2;
+				touched = true;
+ 			}
+			else if (upY < minTy) {
+				matrix.ty += (upY-minTy)*matrixScale;
+				touched = true;
+			}
+			else if (downY > maxTy) {
+				matrix.ty += (downY-maxTy)*matrixScale;
+				touched = true;
+			}
+
+			return touched;			
+		}
+		
 		/** called inside of onRender before events are fired
-		 *  don't use setters inside of here to correct values otherwise we'll get stuck in a loop! */
+		 *  enforceBoundsOnMatrix modifies worldMatrix directly
+		 *  doesn't use scale/zoomLevel setters to correct values otherwise we'd get stuck in a loop! */
  		protected function enforceBounds():Boolean
 		{
 			if (!enforceBoundsEnabled) {
 				return false;
 			}
 			
-			// TODO: should this modify things directly and return true?
- 			if (zoomLevel < minZoom) {
-				scale = Math.pow(2, minZoom);
-			}
-			else if (zoomLevel > maxZoom) {
-				scale = Math.pow(2, maxZoom);
-			} 
-
-			var touched:Boolean = false;
+			var touched:Boolean = enforceBoundsOnMatrix(worldMatrix);
 
 /* 			this is potentially the way to wrap the x position
 			but all the tiles flash and the values aren't quite right
@@ -1420,45 +1217,12 @@ package com.modestmaps.core
 			// zoom topLeft and bottomRight coords to 0
 			// so that they can be compared against minTx etc.
 			
-			var tl:Coordinate = topLeftCoordinate.zoomTo(0);
-			var br:Coordinate = bottomRightCoordinate.zoomTo(0);
-			
-			var leftX:Number = tl.column * tileWidth;
-			var rightX:Number = br.column * tileHeight;
-			
-   			if (rightX-leftX > maxTx-minTx) {
- 				worldMatrix.tx = (mapWidth-(minTx+maxTx)*scale)/2;
-				touched = true;
- 			}
- 			else if (leftX < minTx) {
- 				worldMatrix.tx += (leftX-minTx)*scale;				
-				touched = true;
-			}
- 			else if (rightX > maxTx) {
- 				worldMatrix.tx += (rightX-maxTx)*scale;				
-				touched = true;
-			}
-
- 			var upY:Number = tl.row * tileHeight;
-			var downY:Number = br.row * tileWidth;
-
-   			if (downY-upY > maxTy-minTy) {
- 				worldMatrix.ty = (mapHeight-(minTy+maxTy)*scale)/2;
-				touched = true;
- 			}
-			else if (upY < minTy) {
-				worldMatrix.ty += (upY-minTy)*scale;
-				touched = true;
-			}
-			else if (downY > maxTy) {
-				worldMatrix.ty += (downY-maxTy)*scale;
-				touched = true;
-			} 
-
 			if (touched) {
 				_invertedMatrix = null;
 				_topLeftCoordinate = null;
 				_bottomRightCoordinate = null;
+				_topRightCoordinate = null;
+				_bottomLeftCoordinate = null;
 				_centerCoordinate = null;				
 			}
 
@@ -1473,8 +1237,10 @@ package com.modestmaps.core
 				
 				_invertedMatrix = null;
 				_topLeftCoordinate = null;
-				_bottomRightCoordinate = null;			
-				_centerCoordinate = null;				
+				_bottomRightCoordinate = null;
+				_topRightCoordinate = null;
+				_bottomLeftCoordinate = null;
+				_centerCoordinate = null;					
 			}
 		}
 		
@@ -1555,183 +1321,70 @@ package com.modestmaps.core
 	
 }
 
+import flash.text.TextField;
+import com.modestmaps.core.TileGrid;
 import com.modestmaps.core.Tile;
-import flash.utils.Dictionary;
-import com.modestmaps.Map;	
+import flash.text.TextFormat;
+import flash.utils.getTimer;
+import flash.display.Sprite;
+import flash.system.System;
+import com.modestmaps.core.painter.TilePainter;
+import com.modestmaps.core.painter.ITilePainter;	
 
-class TileQueue
+class DebugField extends TextField
 {
-	// Tiles we want to load:
-	protected var queue:Array;
-	
-	public function TileQueue()
-	{
-		queue = [];
-	}
-	
-	public function get length():Number 
-	{
-		return queue.length;
-	}
+	// for stats:
+	protected var lastFrameTime:Number;
+	protected var fps:Number = 30;	
 
-	public function contains(tile:Tile):Boolean
+	public function DebugField():void
 	{
-		return queue.indexOf(tile) >= 0;
+		defaultTextFormat = new TextFormat(null, 12, 0x000000, false);
+		backgroundColor = 0xffffff;
+		background = true;
+		text = "messages";
+ 		name = 'debugField';
+ 		mouseEnabled = false;
+ 		selectable = false;
+ 		multiline = true;
+ 		wordWrap = false;
+		
+		lastFrameTime = getTimer();		
 	}
+	
+	public function update(grid:TileGrid, blankCount:int, recentCount:int, tilePainter:ITilePainter):void
+	{
+		// for stats...
+		var frameDuration:Number = getTimer() - lastFrameTime;
+		
+		lastFrameTime = getTimer();
+		
+		fps = (0.9 * fps) + (0.1 * (1000.0/frameDuration));
 
-	public function remove(tile:Tile):void
-	{
-		var index:int = queue.indexOf(tile); 
-		if (index >= 0) { 
-			queue.splice(index, 1);
-		}
-	}
-	
-	public function push(tile:Tile):void
-	{
- 		if (contains(tile)) {
-			throw new Error("that tile is already on the queue!");
-		}
-		queue.push(tile);
-	}
-	
-	public function shift():Tile
-	{
-		return queue.shift() as Tile;
-	}
-	
-	public function sortTiles(callback:Function):void
-	{
-		queue = queue.sort(callback);
-	}
-	
-	public function retainAll(tiles:Array):Array
-	{
-		var removed:Array = [];
-		for (var i:int = queue.length-1; i >= 0; i--) {
-			var tile:Tile = queue[i] as Tile;
-			if (tiles.indexOf(tile) < 0) {
-				removed.push(tile);
-				queue.splice(i,1);
-			} 
-		}
-		return removed;
-	}
-	
-	public function clear():void
-	{
-		queue = [];
-	}
-	
-}
+		var well:Sprite = grid.getChildByName('well') as Sprite;
 
-/** the alreadySeen Dictionary here will contain up to grid.maxTilesToKeep Tiles */
-class TileCache
-{
-	// Tiles we've already seen and fully loaded, by key (.name)
-	protected var alreadySeen:Dictionary;
-	protected var tilePool:TilePool; // for handing tiles back!
-	
-	public function TileCache(tilePool:TilePool)
-	{
-		this.tilePool = tilePool;
-		alreadySeen = new Dictionary();
-	}
-	
-	public function get size():int
-	{
-		var alreadySeenCount:int = 0;
-		for (var key:* in alreadySeen) {
-			alreadySeenCount++;
+ 		// report stats:
+ 		var tileChildren:int = 0;
+		for (var i:int = 0; i < well.numChildren; i++) {
+			tileChildren += Tile(well.getChildAt(i)).numChildren;
 		}
-		return alreadySeenCount;		
-	}
-	
-	public function putTile(tile:Tile):void
-	{
-		if (alreadySeen[tile.name]) {
-			throw new Error("caching a tile that's already cached");
-		}
- 		if (tile.numChildren == 0) {
-			throw new Error("tile added to cache has no children!");
-		}
-		alreadySeen[tile.name] = tile;
-	}
-	
-	public function getTile(key:String):Tile
-	{
-		return alreadySeen[key] as Tile;
-	}
-	
-	public function containsKey(key:String):Boolean
-	{
-		return alreadySeen[key] is Tile;
-	}
-	
-	public function retainKeys(keys:Array):void
-	{
-		for (var key:String in alreadySeen) {
-			if (keys.indexOf(key) < 0) {
-				tilePool.returnTile(alreadySeen[key] as Tile);
-				delete alreadySeen[key];
-			}
-		}		
-	}
-	
-	public function clear():void
-	{
-		for (var key:String in alreadySeen) {
-			tilePool.returnTile(alreadySeen[key] as Tile);
-			delete alreadySeen[key];
-		}
-		alreadySeen = new Dictionary();		
-	}
-}
-
-/** 
- *  This post http://lab.polygonal.de/2008/06/18/using-object-pools/
- *  suggests that using Object pools, especially for complex classes like Sprite
- *  is a lot faster than calling new Object().  The suggested implementation
- *  uses a linked list, but to get started with it here I'm using an Array.  
- *  
- *  If anyone wants to try it with a linked list and compare the times,
- *  it seems like it could be worth it :)
- */ 
-class TilePool 
-{
-	protected static const MIN_POOL_SIZE:int = 256;
-	protected static const MAX_NEW_TILES:int = 256;
-	
-	protected var pool:Array = [];
-	protected var tileClass:Class;
-	
-	public function TilePool(tileClass:Class)
-	{
-		this.tileClass = tileClass;
-	}
-
-	public function setTileClass(tileClass:Class):void
-	{
-		this.tileClass = tileClass;
-		pool = [];
-	}
-
-	public function getTile(column:int, row:int, zoom:int):Tile
-	{
-    	if (pool.length < MIN_POOL_SIZE) {
-    		while (pool.length < MAX_NEW_TILES) {
-    			pool.push(new tileClass(0,0,0));
-    		}
-    	}						
-		var tile:Tile = pool.pop() as Tile;
-		tile.init(column, row, zoom);
-		return tile;
-	}
-
-	public function returnTile(tile:Tile):void
-	{
-		tile.destroy();
-    	pool.push(tile);
-	}
-	
+		  
+		this.text = "tx: " + grid.tx.toFixed(3)
+				+ "\nty: " + grid.ty.toFixed(3)
+				+ "\nsc: " + grid.scale.toFixed(4)
+				+ "\nfps: " + fps.toFixed(0)
+				+ "\ncurrent child count: " + well.numChildren
+				+ "\ncurrent child of tile count: " + tileChildren
+				+ "\nvisible tile count: " + grid.getVisibleTiles().length
+				+ "\nblank count: " + blankCount
+				+ "\nrecently used tiles: " + recentCount
+				+ "\ntiles created: " + Tile.count
+				+ "\nqueue length: " + tilePainter.getQueueCount()
+				+ "\nrequests: " + tilePainter.getRequestCount()
+				+ "\nfinished (cached) tiles: " + tilePainter.getCacheSize()
+				+ "\ncachedLoaders: " + tilePainter.getLoaderCacheCount()
+				+ "\nmemory: " + (System.totalMemory/1048576).toFixed(1) + "MB"; 
+		width = textWidth+8;
+		height = textHeight+4;
+	}	
 }

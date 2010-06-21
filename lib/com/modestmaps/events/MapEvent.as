@@ -1,5 +1,5 @@
 /*
- * $Id: MapEvent.as 707 2008-10-24 22:52:27Z allens $
+ * $Id: MapEvent.as 831 2009-11-14 02:50:08Z tom.carden $
  */
 
 package com.modestmaps.events
@@ -100,7 +100,7 @@ package com.modestmaps.events
 		
 		override public function clone():Event
 		{
-			return this;
+			return new MapEvent(this.type);
 		}
 	}
 }

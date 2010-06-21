@@ -2,7 +2,7 @@
  * MapProvider for Open Street Map data.
  * 
  * @author migurski
- * $Id: OpenStreetMapProvider.as 647 2008-08-25 23:38:15Z tom $
+ * $Id: OpenStreetMapProvider.as 765 2009-02-15 23:14:34Z tom $
  */
 package com.modestmaps.mapproviders
 { 
@@ -25,6 +25,9 @@ package com.modestmaps.mapproviders
 	    public function getTileUrls(coord:Coordinate):Array
 	    {
 	        var sourceCoord:Coordinate = sourceCoordinate(coord);
+	        if (sourceCoord.row < 0 || sourceCoord.row >= Math.pow(2, coord.zoom)) {
+	        	return [];
+	        }
 	        return [ 'http://tile.openstreetmap.org/'+(sourceCoord.zoom)+'/'+(sourceCoord.column)+'/'+(sourceCoord.row)+'.png' ];
 	    }
 	    

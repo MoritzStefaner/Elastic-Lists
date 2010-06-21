@@ -25,9 +25,9 @@ package com.modestmaps.extras
             this.miterLimit = miterLimit;
         }
         
-        public function apply(graphics:Graphics, mod:Number=1):void
+        public function apply(graphics:Graphics, thicknessMod:Number=1, alphaMod:Number=1):void
         {
-            graphics.lineStyle(thickness*mod, color, alpha, pixelHinting, scaleMode, caps, joints, miterLimit);
+            graphics.lineStyle(thickness * thicknessMod, color, alpha * alphaMod, pixelHinting, scaleMode, caps, joints, miterLimit);
         }
     }    
 }

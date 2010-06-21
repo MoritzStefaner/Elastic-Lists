@@ -26,8 +26,8 @@ package com.modestmaps.overlays
 
 		override protected function markerInBounds(marker:DisplayObject, w:Number, h:Number):Boolean
 		{
-   			var rect:Rectangle = new Rectangle(-w, -h, w*2, h*2);
-			return rect.intersects(marker.getBounds(this));
+   			var rect:Rectangle = new Rectangle(-w, -h, w*3, h*3);
+			return rect.intersects(marker.getBounds(map));
 		}
 		
 		override public function updateClip(marker:DisplayObject):Boolean

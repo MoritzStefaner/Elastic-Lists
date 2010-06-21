@@ -174,17 +174,20 @@ package com.modestmaps.extras
 				navMap.grid.zoomLevel = map.grid.zoomLevel - zoomOffset;
 				ignoreNav = false;
 								
-				var extent:MapExtent = map.getExtent();
-				
-				var nw:Point = navMap.locationPoint(extent.northWest);
-				var se:Point = navMap.locationPoint(extent.southEast);
+				var nw:Point = navMap.locationPoint(map.pointLocation(new Point(0,0)));
+				var ne:Point = navMap.locationPoint(map.pointLocation(new Point(map.getWidth(),0)));
+				var se:Point = navMap.locationPoint(map.pointLocation(new Point(map.getWidth(),map.getHeight())));
+				var sw:Point = navMap.locationPoint(map.pointLocation(new Point(0,map.getHeight())));
 
 				box.graphics.clear();
 				box.graphics.lineStyle();
 				box.graphics.beginFill(boxFillColor, boxFillAlpha);
 				box.graphics.drawRect(0,0,navWidth,navHeight);
 				box.graphics.lineStyle(boxLineThickness, boxLineColor, 1, false, LineScaleMode.NONE);
-				box.graphics.drawRect(nw.x,nw.y,se.x-nw.x,se.y-nw.y);
+				box.graphics.moveTo(nw.x, nw.y);
+				box.graphics.lineTo(ne.x, ne.y);
+				box.graphics.lineTo(se.x, se.y);
+				box.graphics.lineTo(sw.x, sw.y);
 				box.graphics.endFill();
 			}
 			

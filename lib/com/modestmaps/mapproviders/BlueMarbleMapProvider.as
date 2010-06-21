@@ -1,6 +1,6 @@
 /**
  * @author migurski
- * $Id: BlueMarbleMapProvider.as 647 2008-08-25 23:38:15Z tom $
+ * $Id: BlueMarbleMapProvider.as 804 2009-05-30 00:15:17Z allens $
  */
 package com.modestmaps.mapproviders
 {
@@ -10,9 +10,12 @@ package com.modestmaps.mapproviders
 		extends AbstractMapProvider
 		implements IMapProvider
 	{
+	    public var baseURL:String;
+	    
 	    public function BlueMarbleMapProvider(minZoom:int=MIN_ZOOM, maxZoom:int=MAX_ZOOM)
         {
             super(minZoom, Math.min(9, maxZoom));
+            if (!baseURL) baseURL = 'http://s3.amazonaws.com/com.modestmaps.bluemarble/';
 	    }
 	
 	    public function toString():String
@@ -23,9 +26,10 @@ package com.modestmaps.mapproviders
 	    public function getTileUrls(coord:Coordinate):Array
 	    {
 	        var sourceCoord:Coordinate = sourceCoordinate(coord);
-	        return [ 'http://s3.amazonaws.com/com.modestmaps.bluemarble/' + 
-	        		 (sourceCoord.zoom) + '-r' + (sourceCoord.row) + '-c' + (sourceCoord.column) +
-	        	    '.jpg' ];
+	        if (sourceCoord.row < 0 || sourceCoord.row >= Math.pow(2, coord.zoom)) {
+	        	return [];
+	    	}
+	        return [ baseURL + (sourceCoord.zoom) + '-r' + (sourceCoord.row) + '-c' + (sourceCoord.column) + '.jpg' ];
 	    }
 	    
 	}

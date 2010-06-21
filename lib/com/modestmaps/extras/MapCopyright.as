@@ -9,6 +9,7 @@ package com.modestmaps.extras
 	import flash.external.ExternalInterface;
 	import flash.text.TextField;
 	import flash.text.TextFormat;
+	import flash.text.TextFormatAlign;
 	import flash.utils.clearTimeout;
 	import flash.utils.setTimeout;
 
@@ -52,6 +53,10 @@ package com.modestmaps.extras
 					        
 					                case 'OPEN_STREET_MAP':
 					                    document.getElementById(this.swfId).copyrightCallback('Map data <a href=\'http://www.openstreetmap.org\'>CC-BY-SA OpenStreetMap.org</a>');
+					                    break;
+					        
+					                case 'CLOUDMADE':
+					                    document.getElementById(this.swfId).copyrightCallback('Map tiles &copy; <a href="http://www.cloudmade.com">CloudMade</a>. Map data <a href=\'http://www.openstreetmap.org\'>CC-BY-SA OpenStreetMap.org</a>');
 					                    break;
 					        
 					                case 'MICROSOFT_ROAD':
@@ -201,7 +206,9 @@ package com.modestmaps.extras
 			copyrightField.defaultTextFormat = new TextFormat('Arial', 10, 0x000000, false, null, null, null, '_blank');
 			copyrightField.selectable = false;
 			copyrightField.mouseEnabled = true;
+			copyrightField.multiline = true;
 			addChild(copyrightField);			
+			onMapChange(null);	
 		}
 		
 	    protected var copyrightTimeout:uint;
