@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Facet Boxes/facetBox_bg" itemID="47190ebf-00000c38" sourceFlashFilepath="../../../../../../working copy/demos/archiProjects/fla/ArchitecturalProjectsBrowser.fla" sourceLibraryItemHRef="Facet Boxes/facetBox_bg" sourceLastModified="1197758704" lastModified="1278511189" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="facetBox_bg">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#E9E9E9"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!0 5000|0 0!0 0|4000 0!4000 0|4000 5000!4000 5000|0 5000"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

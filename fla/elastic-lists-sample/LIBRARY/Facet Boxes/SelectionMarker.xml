@@ -1,0 +1,34 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Facet Boxes/SelectionMarker" itemID="4746d111-0000104a" linkageExportForAS="true" linkageBaseClass="flash.display.Sprite" linkageClassName="eu.stefaner.elasticlists.ui.elements.SelectionMarker" sourceFlashFilepath="../../../../../../working copy/demos/archiProjects/fla/ArchitecturalProjectsBrowser.fla" sourceLibraryItemHRef="UI elements/shared/SelectionMarker" sourceLastModified="1222268927" lastModified="1259527575" lastUniqueIdentifier="4">
+  <timeline>
+    <DOMTimeline name="SelectionMarker">
+      <layers>
+        <DOMLayer name="Ebene 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Facet Boxes/marker_grfx" name="" selected="true" blendMode="multiply" centerPoint3DX="94" centerPoint3DY="10">
+                  <matrix>
+                    <Matrix a="0.939743041992188" d="1.25"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="99.9" y="8"/>
+                  </transformationPoint>
+                  <color>
+                    <Color alphaMultiplier="0.8984375"/>
+                  </color>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Layer 2" color="#9933CC" autoNamed="false" layerType="guide">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

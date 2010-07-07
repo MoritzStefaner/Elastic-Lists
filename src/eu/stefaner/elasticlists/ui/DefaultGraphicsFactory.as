@@ -27,9 +27,6 @@ package eu.stefaner.elasticlists.ui {
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFormat;
 
-	/**
-	 * @author mo
-	 */
 	public class DefaultGraphicsFactory {
 
 		[Embed(source="/assets/PTS55F.ttf", fontName="regularFont", advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
@@ -40,7 +37,7 @@ package eu.stefaner.elasticlists.ui {
 		private var boldFont : Class;
 		
 		public static var regularFontName : String = "regularFont";
-		public static var boldFontName : String = "regularFont";
+		public static var boldFontName : String = "boldFont";
 
 		public static function getTextField() : TextField {
 			var t : TextField = new TextField();

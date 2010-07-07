@@ -1,0 +1,98 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Facet Boxes/ElasticList/elasticListEntry" itemID="4717721d-000036dd" linkageExportForAS="true" linkageBaseClass="flash.display.Sprite" linkageClassName="eu.stefaner.elasticlists.ui.facetboxes.elasticlist.ElasticListEntry" sourceFlashFilepath="../../../../../../working copy/demos/archiProjects/fla/ArchitecturalProjectsBrowser.fla" sourceLibraryItemHRef="Facet Boxes/ElasticList/elasticListEntry" sourceLastModified="1222268927" lastModified="1278511414" lastUniqueIdentifier="39" isSpriteSubclass="true">
+  <timeline>
+    <DOMTimeline name="elasticListEntry">
+      <layers>
+        <DOMLayer name="Layer 17" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Facet Boxes/highlightMarker" name="highlightMarker" centerPoint3DX="92.6" centerPoint3DY="11.65">
+                  <matrix>
+                    <Matrix d="2.83245849609375"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point y="0.9"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="bg" color="#9933CC" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMDynamicText name="title_tf" width="115.8" height="14" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="4" ty="4.75"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>United States</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" alpha="0.709803921568627" size="11" bitmapSize="220" face="DroidSans"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="num_tf" color="#4FFFFF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMDynamicText name="num_tf" width="22.3" height="14" includeOutlines="true" isSelectable="false">
+                  <matrix>
+                    <Matrix tx="103.2" ty="4.75"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>199</characters>
+                      <textAttrs>
+                        <DOMTextAttrs alignment="right" aliasText="false" autoKern="false" alpha="0.494117647058824" size="11" bitmapSize="220" face="DroidSans-Bold" fillColor="#993300"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="selectionMarker" color="#808080" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Facet Boxes/SelectionMarker" name="selectionMarker" centerPoint3DX="92.6" centerPoint3DY="10">
+                  <matrix>
+                    <Matrix a="0.985336303710938"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point y="0.9"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="bg" color="#4F80FF" autoNamed="false">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Facet Boxes/background" name="bg" cacheAsBitmap="true" centerPoint3DX="92.6" centerPoint3DY="10">
+                  <matrix>
+                    <Matrix a="1.23497009277344"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point y="0.9"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

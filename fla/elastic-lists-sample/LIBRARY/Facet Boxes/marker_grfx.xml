@@ -1,0 +1,26 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Facet Boxes/marker_grfx" itemID="4746d0e4-00000f01" sourceFlashFilepath="../../../../../../working copy/demos/archiProjects/fla/ArchitecturalProjectsBrowser.fla" sourceLibraryItemHRef="UI elements/shared/marker_grfx" sourceLastModified="1195827716" lastModified="1259527575" lastUniqueIdentifier="1">
+  <timeline>
+    <DOMTimeline name="marker_grfx">
+      <layers>
+        <DOMLayer name="Layer 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMShape>
+                  <fills>
+                    <FillStyle index="1">
+                      <SolidColor color="#EEEE11"/>
+                    </FillStyle>
+                  </fills>
+                  <edges>
+                    <Edge fillStyle1="1" edges="!4000.5 319.5|0 319.5!0 319.5|0 0!0 0|4000.5 0!4000.5 0|4000.5 319.5"/>
+                  </edges>
+                </DOMShape>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

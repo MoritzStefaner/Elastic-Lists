@@ -1,0 +1,40 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Facet Boxes/FacetBoxContainer" itemID="4838901b-000010b9" linkageExportForAS="true" linkageClassName="eu.stefaner.elasticlists.ui.facetboxes.FacetBoxContainer" sourceFlashFilepath="../../../../../../working copy/demos/archiProjects/fla/ArchitecturalProjectsBrowser.fla" sourceLibraryItemHRef="FacetBoxContainer" sourceLastModified="1223977049" lastModified="1278511396" lastUniqueIdentifier="19" isSpriteSubclass="true">
+  <timeline>
+    <DOMTimeline name="FacetBoxContainer">
+      <layers>
+        <DOMLayer name="Ebene 1" color="#4FFF4F" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Facet Boxes/facetBoxContainerBG" name="bg" centerPoint3DX="100" centerPoint3DY="295">
+                  <transformationPoint>
+                    <Point x="100" y="295"/>
+                  </transformationPoint>
+                  <filters>
+                    <DropShadowFilter distance="0" quality="3" strength="0.4"/>
+                  </filters>
+                </DOMSymbolInstance>
+                <DOMDynamicText name="title_tf" width="144.55" height="15" includeOutlines="true" isSelectable="false" lineType="multiline">
+                  <matrix>
+                    <Matrix a="1.00035095214844" d="1.00228881835938" tx="4" ty="4"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Title</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" leftMargin="2" lineSpacing="0" rightMargin="2" size="13" bitmapSize="260" face="DroidBold*" fillColor="#666666"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                  <filters>
+                    <DropShadowFilter blurX="2" blurY="2" distance="1" isEnabled="false" quality="3"/>
+                  </filters>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

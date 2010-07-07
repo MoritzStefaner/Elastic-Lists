@@ -1,0 +1,61 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="ContentItemSprite" itemID="47a9ef01-00000357" linkageExportForAS="true" linkageClassName="eu.stefaner.elasticlists.ui.contentitem.ContentItemSprite" sourceFlashFilepath="../../../../../../working copy/demos/archiProjects/fla/ArchitecturalProjectsBrowser.fla" sourceLibraryItemHRef="UI elements/ContentItemContainer/ContentItemSprite" sourceLastModified="1222248436" lastModified="1278511826" lastUniqueIdentifier="41" isSpriteSubclass="true">
+  <timeline>
+    <DOMTimeline name="ContentItemSprite" guides='&lt;guidelines&gt;&lt;guideline direction="h"&gt;2&lt;/guideline&gt;&lt;guideline direction="v"&gt;10&lt;/guideline&gt;&lt;guideline direction="h"&gt;10&lt;/guideline&gt;&lt;guideline direction="v"&gt;315&lt;/guideline&gt;&lt;guideline direction="h"&gt;140&lt;/guideline&gt;&lt;guideline direction="h"&gt;0&lt;/guideline&gt;&lt;/guidelines&gt;'>
+      <layers>
+        <DOMLayer name="Layer 19" color="#FF800A">
+          <frames>
+            <DOMFrame index="0" duration="2" keyMode="9728">
+              <elements>
+                <DOMDynamicText name="title_tf" width="133.15" height="13" includeOutlines="true" isSelectable="false" lineType="multiline">
+                  <matrix>
+                    <Matrix d="0.997299194335938" tx="3.85" ty="3"/>
+                  </matrix>
+                  <textRuns>
+                    <DOMTextRun>
+                      <characters>Title</characters>
+                      <textAttrs>
+                        <DOMTextAttrs aliasText="false" autoKern="false" lineSpacing="0" size="10" bitmapSize="200" face="DroidBold*" fillColor="#333333"/>
+                      </textAttrs>
+                    </DOMTextRun>
+                  </textRuns>
+                </DOMDynamicText>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Ebene 18" color="#9933CC" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" duration="2" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Facet Boxes/SelectionMarker" name="selectionMarker" selected="true" centerPoint3DX="30.1" centerPoint3DY="695.45">
+                  <matrix>
+                    <Matrix a="0.771316528320312" d="5.24971008300781"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="-0.5" y="2.65"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Ebene 11" color="#FFFF4F">
+          <frames>
+            <DOMFrame index="0" duration="2" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="contentItemBg" name="bg" centerPoint3DX="39.05" centerPoint3DY="132.45">
+                  <matrix>
+                    <Matrix a="0.999984741210938" d="0.99993896484375"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="-0.5" y="2.65"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>

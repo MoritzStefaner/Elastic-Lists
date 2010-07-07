@@ -1,0 +1,31 @@
+<DOMSymbolItem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" name="Facet Boxes/ElasticList/elasticListBox" itemID="47012205-00000a3b" linkageExportForAS="true" linkageBaseClass="flash.display.Sprite" linkageClassName="eu.stefaner.elasticlists.ui.facetboxes.elasticlist.ElasticListBox" sourceFlashFilepath="../../../../../../working copy/demos/archiProjects/fla/ArchitecturalProjectsBrowser.fla" sourceLibraryItemHRef="Facet Boxes/ElasticList/elasticListBox" sourceLastModified="1223977037" lastModified="1277385218" lastUniqueIdentifier="15" isSpriteSubclass="true">
+  <timeline>
+    <DOMTimeline name="elasticListBox">
+      <layers>
+        <DOMLayer name="Layer 4" color="#FF4FFF">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements/>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+        <DOMLayer name="Ebene 2" color="#9933CC" current="true" isSelected="true">
+          <frames>
+            <DOMFrame index="0" keyMode="9728">
+              <elements>
+                <DOMSymbolInstance libraryItemName="Facet Boxes/facetBox_bg" name="bg" centerPoint3DX="90" centerPoint3DY="295">
+                  <matrix>
+                    <Matrix a="0.899993896484375" d="0.999862670898438"/>
+                  </matrix>
+                  <transformationPoint>
+                    <Point x="100" y="295.05"/>
+                  </transformationPoint>
+                </DOMSymbolInstance>
+              </elements>
+            </DOMFrame>
+          </frames>
+        </DOMLayer>
+      </layers>
+    </DOMTimeline>
+  </timeline>
+</DOMSymbolItem>
