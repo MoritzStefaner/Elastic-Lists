@@ -48,7 +48,18 @@ package eu.stefaner.elasticlists.data {
 
 		public function Model(a : App) {
 			app = a;
+			init();
 		};
+
+		public function init() : void {
+			facets = [];
+			activeFilters = new Dictionary(true);
+			facetValuesForContentItem = new Dictionary(true);
+			allContentItems = [];
+			filteredContentItems = [];
+			allContentItemsForFacetValue = new Dictionary(true);
+			contentItemsById = new Dictionary(true);
+		}
 
 		public function hasActiveFilters() : Boolean {
 			return !(filteredContentItems.length == allContentItems.length);
