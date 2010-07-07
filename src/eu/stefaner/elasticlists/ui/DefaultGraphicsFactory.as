@@ -38,6 +38,9 @@ package eu.stefaner.elasticlists.ui {
 
 		[Embed(source="/assets/Aller_Bd.ttf", fontName="boldFont",  fontWeight='bold',  advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
 		private var boldFont : Class;
+		
+		public static var regularFontName : String = "regularFont";
+		public static var boldFontName : String = "regularFont";
 
 		public static function getTextField() : TextField {
 			var t : TextField = new TextField();
@@ -45,7 +48,7 @@ package eu.stefaner.elasticlists.ui {
 			t.multiline = false;
 			t.embedFonts = true;
 			t.antiAliasType = AntiAliasType.ADVANCED;
-			var tf : TextFormat = new TextFormat("regularFont", 10, 0x333333);
+			var tf : TextFormat = new TextFormat(regularFontName, 10, 0x333333);
 			t.defaultTextFormat = tf;
 		
 			return t;
@@ -75,7 +78,7 @@ package eu.stefaner.elasticlists.ui {
 
 		public static function getSelectionMarker() : Sprite {
 			var s : Sprite = new Sprite();
-			s.graphics.beginFill(0xDDFF99);
+			s.graphics.beginFill(0xEEEE11);
 			s.graphics.drawRect(0, 0, 100, 100);
 			return s;
 		}
@@ -86,7 +89,7 @@ package eu.stefaner.elasticlists.ui {
 			t.multiline = false;
 			t.embedFonts = true;
 			t.antiAliasType = AntiAliasType.ADVANCED;
-			var tf : TextFormat = new TextFormat("boldFont", 12, 0x333333, true);
+			var tf : TextFormat = new TextFormat(boldFontName, 12, 0x333333, true);
 			t.defaultTextFormat = tf;
 			return t;
 		}
@@ -120,7 +123,7 @@ package eu.stefaner.elasticlists.ui {
 
 		public static function getMapMarkerBackground() : Sprite {
 			var s : Sprite = new Sprite();
-			s.graphics.beginFill(0xFFFFFF);
+			s.graphics.beginFill(0x333333);
 			//s.graphics.lineStyle(0, 0xCCCCCC, 1, false, "none");
 			//s.filters = [new DropShadowFilter(2, 45, 0, .2)];
 			s.graphics.drawCircle(0, 0, 1);
@@ -154,7 +157,7 @@ package eu.stefaner.elasticlists.ui {
 
 		public static function getSliderFacetBoxElementGlobalBar() : Sprite {
 			var s : Sprite = new Sprite();
-			s.graphics.beginFill(0xBBBBBB);
+			s.graphics.beginFill(0xDDDDDD);
 			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
 			s.graphics.drawRect(-1, -2, 2, 2);
 			return s;

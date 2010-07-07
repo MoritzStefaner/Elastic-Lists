@@ -54,12 +54,15 @@ package eu.stefaner.elasticlists.ui.facetboxes.slider {
 			globalBar.x = width * .5 + 1;
 			localBar.y = height - 18;
 			globalBar.y = height - 18;
+			//localBar.height = heightForRatio(facetValue.localRatio);
+			//globalBar.height = heightForRatio(facetValue.globalRatio);
 		}
 
 		override public function set height( h : Number ) : void {
 			bg.height = h;
 			selectionMarker.height = h;
 			layout();
+			updateStats();
 		}
 
 		override public function get height() : Number {
@@ -76,8 +79,12 @@ package eu.stefaner.elasticlists.ui.facetboxes.slider {
 		}
 
 		override public function updateStats() : void {
-			container.transitioner.$(localBar).height = facetValue.localRatio * (height - 18 - 5);
-			container.transitioner.$(globalBar).height = facetValue.globalRatio * (height - 18 - 5);
+			container.transitioner.$(localBar).height = heightForRatio(facetValue.localRatio);
+			container.transitioner.$(globalBar).height = heightForRatio(facetValue.globalRatio) ;
+		}
+
+		private function heightForRatio(r : Number) : Number {
+			return r * (height - 18 - 5);
 		}
 	}
 }

@@ -16,8 +16,18 @@
    
 */
 
-package eu.stefaner.elasticlists.ui.facetboxes {		import eu.stefaner.elasticlists.data.Facet;
-	import eu.stefaner.elasticlists.data.FacetValue;	import eu.stefaner.elasticlists.ui.DefaultGraphicsFactory;	import flare.animate.Transitioner;	import flash.display.Sprite;	import flash.events.Event;	import flash.utils.Dictionary;	/**	FacetBox class	 */	public class FacetBox extends Sprite {		protected static const TRANSITION_DURATION : Number = 1;
+package eu.stefaner.elasticlists.ui.facetboxes {	
+	import eu.stefaner.elasticlists.data.Facet;
+	import eu.stefaner.elasticlists.data.FacetValue;
+	import eu.stefaner.elasticlists.ui.DefaultGraphicsFactory;
+
+	import flare.animate.Transitioner;
+
+	import flash.display.Sprite;
+	import flash.events.Event;
+	import flash.utils.Dictionary;
+
+	/**	FacetBox class	 */	public class FacetBox extends Sprite {		protected static const TRANSITION_DURATION : Number = 1;
 		//---------------------------------------		// PUBLIC VARIABLES		//---------------------------------------		public var bg : Sprite;				public var contentsSprite : Sprite;		public var facetBoxElements : Array = [];		public var facetBoxElementForDataObject : Dictionary = new Dictionary();		// animation transitioner		public var transitioner : Transitioner = Transitioner.instance(null);		// allow only single item selections?		public var singleSelect : Boolean = false;		// max displayed items (per filter context)		public var maxItems : uint = 100;		private var firstRun : Boolean = true;		public var _mask : Sprite;
 		private var _facet : Facet;
 

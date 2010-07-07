@@ -1,4 +1,5 @@
 package eu.stefaner.elasticlists.data {
+	import com.modestmaps.core.MapExtent;
 
 	/**
 	 * @author mo
@@ -16,10 +17,10 @@ package eu.stefaner.elasticlists.data {
 				return true;
 			}
 
-			for each(var facetValue:FacetValue in values) {
-				if(conjunctive && !c.facetValues[facetValue]) {
-					return false;
-				} else if(!conjunctive && c.facetValues[facetValue]) {
+			for each(var f:FilterConstraint in values) {
+				if(conjunctive) {
+					if(!f.match(c)) return false;
+				} else if(f.match(c)) {
 					return true;
 				}
 			}
@@ -32,10 +33,23 @@ package eu.stefaner.elasticlists.data {
 		}
 
 		public function add(facetValue : FacetValue) : void {
-			values.push(facetValue);
+			values.push(new FacetValueConstraint(facetValue));
+		}
+
+		public function addGeoContraint(facet : GeoFacet, filterExtent : MapExtent) : void {
+			values.push(new GeoConstraint(facet, filterExtent));
 		}
 
 		public function get active() : Boolean {
 			return values.length > 0;		}
+
+		public function clearGeoContraints() : void {
+			for (var i : int = 0;i < values.length;i++) {
+				if(values[i] is GeoConstraint) {
+					values.splice(i, 1);
+					i--;
+				}
+			}
+		}
 	}
 }

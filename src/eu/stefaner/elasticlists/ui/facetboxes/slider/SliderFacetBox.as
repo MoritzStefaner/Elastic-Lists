@@ -29,6 +29,7 @@ package eu.stefaner.elasticlists.ui.facetboxes.slider {
 			slider.tick = .01;
 			slider.minimum = 0;
 			slider.maximum = width;
+			bg.alpha = 0;
 		}
 
 		private function onSliderChange(e : Event) : void {
@@ -77,6 +78,7 @@ package eu.stefaner.elasticlists.ui.facetboxes.slider {
 			slider.width = width;
 			slider.y = height - slider.height;
 			slider.maximum = width;
+			doPositioning();
 		}
 
 		override protected function getNewFacetBoxElement() : FacetBoxElement {
@@ -85,7 +87,7 @@ package eu.stefaner.elasticlists.ui.facetboxes.slider {
 
 		override protected function doPositioning() : void {
 			var xx : Number = 0;
-			for each (var sprite:FacetBoxElement in facetBoxElements) {
+			for each (var sprite:SliderFacetBoxElement in facetBoxElements) {
 				sprite.height = height - slider.height;
 				sprite.width = width / facetBoxElements.length;
 				transitioner.$(sprite).x = xx;
