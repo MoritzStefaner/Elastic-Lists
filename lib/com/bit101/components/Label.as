@@ -75,6 +75,7 @@ package com.bit101.components
 			_tf.selectable = false;
 			_tf.mouseEnabled = false;
 			_tf.defaultTextFormat = new TextFormat(Style.fontName, Style.fontSize, Style.LABEL_TEXT);
+			_tf.antiAliasType = Style.antiAliasType;
 			_tf.text = _text;			
 			addChild(_tf);
 			draw();

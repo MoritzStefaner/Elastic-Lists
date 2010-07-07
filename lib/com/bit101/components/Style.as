@@ -27,8 +27,9 @@
  * THE SOFTWARE.
  */
  
-package com.bit101.components
-{
+package com.bit101.components {
+	import flash.text.AntiAliasType;
+
 	public class Style
 	{
 		public static var BACKGROUND:uint = 0xCCCCCC;
@@ -42,5 +43,6 @@ package com.bit101.components
 		public static var embedFonts:Boolean = true;
 		public static var fontName:String = "PF Ronda Seven";
 		public static var fontSize:Number = 8;
+		public static var antiAliasType : String = AntiAliasType.ADVANCED;
 	}
 }
