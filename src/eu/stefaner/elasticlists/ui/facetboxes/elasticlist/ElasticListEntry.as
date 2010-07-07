@@ -59,6 +59,8 @@ package eu.stefaner.elasticlists.ui.facetboxes.elasticlist {
 		override protected function initGraphics() : void {
 			if(!bg) {
 				bg = DefaultGraphicsFactory.getElasticListEntryBackground();
+				bg.graphics.lineStyle(0, 0, .2);
+				bg.graphics.lineTo(bg.width, 0);
 				addChild(bg);
 			}
 			super.initGraphics();
@@ -70,8 +72,6 @@ package eu.stefaner.elasticlists.ui.facetboxes.elasticlist {
 			title_tf.autoSize = TextFieldAutoSize.NONE;
 			title_tf.multiline = false;
 			num_tf.textColor = 0xAAAAAA;
-			bg.graphics.lineStyle(0, 0, .2);
-			bg.graphics.lineTo(bg.width, 0);
 		}
 
 		//---------------------------------------

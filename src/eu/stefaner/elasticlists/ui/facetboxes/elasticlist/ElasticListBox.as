@@ -16,9 +16,18 @@
    
 */
 
-package eu.stefaner.elasticlists.ui.facetboxes.elasticlist {	import flare.animate.TransitionEvent;
+package eu.stefaner.elasticlists.ui.facetboxes.elasticlist {	import eu.stefaner.elasticlists.ui.facetboxes.FacetBox;
+	import eu.stefaner.elasticlists.ui.facetboxes.FacetBoxElement;
+
+	import flare.animate.TransitionEvent;
 	import flare.animate.Transitioner;
-	import eu.stefaner.elasticlists.ui.facetboxes.FacetBox;	import eu.stefaner.elasticlists.ui.facetboxes.FacetBoxElement;	import com.bit101.components.VScrollBar;	import org.osflash.thunderbolt.Logger;	import flash.events.Event;	import flash.geom.Rectangle;	public class ElasticListBox extends FacetBox {
+
+	import com.bit101.components.VScrollBar;
+
+	import flash.events.Event;
+	import flash.geom.Rectangle;
+
+	public class ElasticListBox extends FacetBox {
 		public var scrollBar : VScrollBar;
 		public function ElasticListBox() {			super();		}		override protected function initGraphics() : void {			super.initGraphics();						scrollBar = new VScrollBar(this, 0, 0, onScrollBarMoved);			addChild(scrollBar);		}		public function onScrollBarMoved(e : Event) : void {			contentsSprite.y = -scrollBar.value;
 		}
