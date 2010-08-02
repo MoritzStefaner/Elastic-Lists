@@ -29,8 +29,9 @@ package eu.stefaner.elasticlists.ui {
 
 	public class DefaultGraphicsFactory {
 
-		[Embed(source="/assets/PTS55F.ttf", fontName="regularFont", advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
+		public static var highlightColor : uint = 0xEEEE11;
 
+		[Embed(source="/assets/PTS55F.ttf", fontName="regularFont", advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
 		private var regularFont : Class;
 
 		[Embed(source="/assets/Aller_Bd.ttf", fontName="boldFont",  fontWeight='bold',  advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
@@ -38,6 +39,7 @@ package eu.stefaner.elasticlists.ui {
 		
 		public static var regularFontName : String = "regularFont";
 		public static var boldFontName : String = "boldFont";
+		
 
 		public static function getTextField() : TextField {
 			var t : TextField = new TextField();
@@ -75,7 +77,7 @@ package eu.stefaner.elasticlists.ui {
 
 		public static function getSelectionMarker() : Sprite {
 			var s : Sprite = new Sprite();
-			s.graphics.beginFill(0xEEEE11);
+			s.graphics.beginFill(highlightColor);
 			s.graphics.drawRect(0, 0, 100, 100);
 			return s;
 		}
@@ -129,7 +131,7 @@ package eu.stefaner.elasticlists.ui {
 
 		public static function getMapMarkerSelectionMarker() : Sprite {
 			var s : Sprite = new Sprite();
-			s.graphics.beginFill(0xDDFF99);
+			s.graphics.beginFill(highlightColor);
 			//s.graphics.lineStyle(0, 0xCCCCCC, 1);
 			s.graphics.drawCircle(0, 0, 1);
 			return s;
