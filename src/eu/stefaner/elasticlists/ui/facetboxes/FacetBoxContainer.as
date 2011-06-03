@@ -70,7 +70,7 @@ package eu.stefaner.elasticlists.ui.facetboxes {
 			this.facet = facet;
 			this.facetBox = facetBox;
 			facetBox.facet = facet;
-			title = facet.label;
+			title = facet.label.toUpperCase();
 			
 			addChild(facetBox);
 				
@@ -167,7 +167,7 @@ package eu.stefaner.elasticlists.ui.facetboxes {
 		}
 
 		public function set title( value : String ) : void {
-			title_tf.text = value.toUpperCase();
+			title_tf.text = value;
 		}
 	}
 }

@@ -1,12 +1,10 @@
 package eu.stefaner.elasticlists.demos.warlogs {
-	import flash.events.Event;
-
-	import eu.stefaner.elasticlists.ui.appcomponents.ContentArea;
 	import eu.stefaner.elasticlists.App;
 	import eu.stefaner.elasticlists.data.ContentItem;
 	import eu.stefaner.elasticlists.data.DataConnector;
 	import eu.stefaner.elasticlists.data.Facet;
 	import eu.stefaner.elasticlists.ui.DefaultGraphicsFactory;
+	import eu.stefaner.elasticlists.ui.appcomponents.ContentArea;
 	import eu.stefaner.elasticlists.ui.contentitem.ContentItemSprite;
 	import eu.stefaner.elasticlists.ui.facetboxes.FacetBox;
 	import eu.stefaner.elasticlists.ui.facetboxes.FacetBoxContainer;
@@ -15,12 +13,11 @@ package eu.stefaner.elasticlists.demos.warlogs {
 	import eu.stefaner.elasticlists.ui.facetboxes.slider.SliderFacetBox;
 
 	import com.bit101.components.HBox;
-	import com.bit101.components.Style;
 	import com.bit101.components.VBox;
 
 	import org.osflash.thunderbolt.Logger;
 
-	import flash.text.AntiAliasType;
+	import flash.events.Event;
 
 	/**
 	 * @author mo

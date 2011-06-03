@@ -17,6 +17,7 @@ limitations under the License.
  */
 
 package eu.stefaner.elasticlists {
+
 	import eu.stefaner.elasticlists.data.ContentItem;
 	import eu.stefaner.elasticlists.data.DataConnector;
 	import eu.stefaner.elasticlists.data.Facet;
@@ -80,7 +81,7 @@ package eu.stefaner.elasticlists {
 		 * dispatched when all facets are loaded and inited
 		 * TODO: revisit - really needed?
 		 */
-		// 
+		//
 		public static var FACETS_CHANGED : String = "FACETS_CHANGED";
 		/**
 		 * disptached when (visible or all) contentitems have changed
@@ -94,6 +95,7 @@ package eu.stefaner.elasticlists {
 		protected var margin : Number = 15;
 		protected var hBox : HBox;
 		protected var titleTextField : TextField;
+
 		/**
 		 * constructor, calls @see startup
 		 */
@@ -142,7 +144,7 @@ package eu.stefaner.elasticlists {
 			Logger.info("App.onDataLoaded");
 			initDisplay();
 			model.updateGlobalStats();
-			
+
 			dispatchEvent(new Event(FACETS_CHANGED));
 			dispatchEvent(new Event(CONTENTITEMS_CHANGED));
 			applyFilters();
@@ -152,30 +154,30 @@ package eu.stefaner.elasticlists {
 			// create facet boxes etc
 			vBox = new VBox(this, margin, margin);
 			vBox.spacing = margin;
-			
+
 			titleTextField = DefaultGraphicsFactory.getTitleTextField();
 			titleTextField.scaleX = titleTextField.scaleY = 2;
-			if(loaderInfo.parameters.appTitle) {
-				title = loaderInfo.parameters.appTitle; 
+			if (loaderInfo.parameters.appTitle) {
+				title = loaderInfo.parameters.appTitle;
 			} else {
 				title = _title;
 			}
-			
+
 			vBox.addChild(titleTextField);
-			
+
 			hBox = new HBox(vBox, 0, 0);
 			hBox.spacing = margin * .33;
-			
+
 			for each (var facet:Facet in model.facets) {
-				
+
 				var f : FacetBoxContainer = new FacetBoxContainer(this);
 				var facetBox : FacetBox;
-				if(facet is GeoFacet) {
+				if (facet is GeoFacet) {
 					facetBox = new GeoFacetBox();
 				} else {
 					facetBox = new ElasticListBox();
 				}
-				
+
 				f.init(facet, facetBox);
 				hBox.addChild(f);
 				f.width = 180 + 180 * Number(facet is GeoFacet);
@@ -185,17 +187,18 @@ package eu.stefaner.elasticlists {
 			contentArea = new ContentArea();
 			contentArea.init(this);
 			vBox.addChild(contentArea);
-			
+
 			layout();
 		}
 
 		protected function layout() : void {
 			hBox.draw();
 			vBox.draw();
-			
+
 			contentArea.width = stage.stageWidth - margin * 2;
-			contentArea.height = stage.stageHeight - contentArea.getBounds(this).top - margin ;	
+			contentArea.height = stage.stageHeight - contentArea.getBounds(this).top - margin ;
 		}
+
 		/*
 		 * creates and returns the dataConnector
 		 */
@@ -217,7 +220,7 @@ package eu.stefaner.elasticlists {
 		/*
 		 * called by ContentArea to get a sprite for a contentItem
 		 */
-		// 
+		//
 		public function createContentItemSprite(contentItem : ContentItem) : ContentItemSprite {
 			return new ContentItemSprite(contentItem);
 		}
@@ -227,21 +230,21 @@ package eu.stefaner.elasticlists {
 		 * TODO: use events?
 		 */
 		public function applyFilters() : void {
-			
+
 			model.applyFilters();
-			
+
 			for each (var facet:Facet in model.facets) {
 				facet.calcLocalStats();
 			}
-			
+
 			dispatchEvent(new Event(FILTERS_CHANGED));
-			
-			if(!contentArea) return;
-			
+
+			if (!contentArea) return;
+
 			if (contentArea.selectedContentItem && contentArea.selectedContentItem.filteredOut) {
 				contentArea.selectedContentItem.selected = false;
 			}
-			
+
 			showDetails(contentArea.selectedContentItem);
 		}
 
@@ -263,7 +266,7 @@ package eu.stefaner.elasticlists {
 
 		public function set title(title : String) : void {
 			_title = title;
-			if(titleTextField) titleTextField.text = title;
+			if (titleTextField) titleTextField.text = title;
 		}
 	}
 }

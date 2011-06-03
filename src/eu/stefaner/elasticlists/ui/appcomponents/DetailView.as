@@ -1,4 +1,4 @@
- /*
+/*
    
   Copyright 2010, Moritz Stefaner
 
@@ -14,6 +14,36 @@
    See the License for the specific language governing permissions and
    limitations under the License.
    
-*/
+ */
+package eu.stefaner.elasticlists.ui.appcomponents {
+	/**	 *	Class description.	 *	 *	@langversion ActionScript 3.0	 *	@playerversion Flash 9.0	 *	 *	@author moritz@stefaner.eu	 *	@since  23.11.2007	 */
+	import eu.stefaner.elasticlists.data.ContentItem;
+	import eu.stefaner.elasticlists.ui.DefaultGraphicsFactory;
 
-package eu.stefaner.elasticlists.ui.appcomponents {			/**	 *	Class description.	 *	 *	@langversion ActionScript 3.0	 *	@playerversion Flash 9.0	 *	 *	@author moritz@stefaner.eu	 *	@since  23.11.2007	 */	import eu.stefaner.elasticlists.data.ContentItem;	import eu.stefaner.elasticlists.ui.DefaultGraphicsFactory;	import flash.display.Sprite;	import flash.text.TextField;	public class DetailView extends Sprite {		public var bg:Sprite;		public var title_tf:TextField;			public function DetailView() {			super();			initGraphics();		}				private function initGraphics() : void {			if(!title_tf) {				title_tf=DefaultGraphicsFactory.getTitleTextField();				addChild(title_tf);			}		}		public function display(c:ContentItem):void {			title_tf.text = c.title;		}	}}
+	import flash.display.Sprite;
+	import flash.text.TextField;
+
+	public class DetailView extends Sprite {
+		public var bg : Sprite;
+		public var title_tf : TextField;
+
+		public function DetailView() {
+			super();
+			initGraphics();
+		}
+
+		private function initGraphics() : void {
+			if(!title_tf) {
+				title_tf = DefaultGraphicsFactory.getTitleTextField();
+				addChild(title_tf);
+			}
+		}
+
+		public function display(c : ContentItem):void {
+			try {
+				title_tf.text = c.title;
+			} catch(error : Error) {
+			}
+		}
+	}
+}

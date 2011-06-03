@@ -31,10 +31,10 @@ package eu.stefaner.elasticlists.ui {
 
 		public static var highlightColor : uint = 0xEEEE11;
 
-		[Embed(source="/assets/PTS55F.ttf", fontName="regularFont", advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
+		//[Embed(source="/assets/PTS55F.ttf", fontName="regularFont", advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
 		private var regularFont : Class;
 
-		[Embed(source="/assets/Aller_Bd.ttf", fontName="boldFont",  fontWeight='bold',  advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
+		//[Embed(source="/assets/Aller_Bd.ttf", fontName="boldFont",  fontWeight='bold',  advancedAntiAliasing="true", mimeType="application/x-font-truetype")]
 		private var boldFont : Class;
 		
 		public static var regularFontName : String = "regularFont";
